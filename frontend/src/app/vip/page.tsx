@@ -8,48 +8,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#031716]">
       {/* Navigation */}
-       <nav className="relative flex items-center justify-between px-8 py-4 border-b border-[#0c969c]">
-        <div className="flex items-center">
-          <img src="/pictures/logo.jpg" alt="Logo" className="h-8 mr-2" />
-          <h1 className="text-2xl font-bold text-white">NextLeague</h1>
-        </div>
-        <button
-          className="md:hidden text-white p-2"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {!isMenuOpen ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          )}
-        </button>
-        {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-[#032f30] md:hidden p-4 space-y-4 z-50">
-            <a href="#league" className="block text-white hover:text-[#6ba3be] py-2 px-4">League</a>
-            <a href="#club" className="block text-white hover:text-[#6ba3be] py-2 px-4">Club</a>
-            <a href="#vip" className="block text-white hover:text-[#6ba3be] py-2 px-4">VIP</a>
-            <a href="#profile" className="block text-white hover:text-[#6ba3be] py-2 px-4">My Profile</a>
-            <div className="pt-4 border-t border-[#0c969c]">
-              <button className="w-full text-white hover:text-[#6ba3be] py-2 px-4 text-left">Sign In</button>
-              <button className="w-full bg-[#0c969c] text-white py-2 px-4 rounded-md hover:bg-[#0a7075] mt-2">Get Started</button>
-            </div>
-          </div>
-        )}
-        <div className="hidden md:flex items-center space-x-8">
-          <a href="#league" className="text-white hover:text-[#6ba3be]">League</a>
-          <a href="#club" className="text-white hover:text-[#6ba3be]">Club</a>
-          <a href="#vip" className="text-white hover:text-[#6ba3be]">VIP</a>
-          <a href="#profile" className="text-white hover:text-[#6ba3be]">My Profile</a>
-        </div>
-        <div className="hidden md:flex items-center space-x-4">
-          <button className="text-white hover:text-[#6ba3be]">Sign In</button>
-          <button className="bg-[#0c969c] text-white px-6 py-2 rounded-md hover:bg-[#0a7075]">Get Started</button>
-        </div>
-      </nav>
+       
 
       {/* Pricing Section */}
       <section className="max-w-7xl mx-auto px-8 py-20">
