@@ -2,11 +2,11 @@ from fastapi import APIRouter, Response, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi import Body
 from sqlmodel import Session, select
-from NextLeague.backend.models.models import User
-from NextLeague.backend.database.database import engine
+from backend.models.models import User
+from backend.database.database import engine
 from hashlib import sha256
-from NextLeague.backend.schemas.auth import LoginRequest  
-from NextLeague.backend.schemas.auth import RegisterRequest
+from backend.schemas.auth import LoginRequest  
+from backend.schemas.auth import RegisterRequest
 #U OVOM FOLDERU PRAVIMO I league.py, team.py da odvojim kod i kasnije ih importamo u main
 
 router = APIRouter()

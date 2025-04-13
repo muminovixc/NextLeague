@@ -1,0 +1,5 @@
+pip install fastapi uvicorn
+pip install sqlmodel
+pip install psycopg2
+pip install pydantic[email]
+# za pokretanje je :  uvicorn backend.main:app --reload

@@ -1,9 +1,9 @@
 
 from fastapi import FastAPI, Depends
 from sqlmodel import Session, select
-from NextLeague.backend.database.database import engine
-from NextLeague.backend.models.models import User
-from NextLeague.backend.routes.auth import router as auth_router
+from backend.database.database import engine
+from backend.models.models import User
+from backend.routes.auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
