@@ -1,13 +1,39 @@
-from fastapi import FastAPI
-from auth import router  # Uvezi router iz auth.py
-from database import engine, Base
 
-# Kreiraj FastAPI aplikaciju
+from fastapi import FastAPI, Depends
+from sqlmodel import Session, select
+from NextLeague.backend.database.database import engine
+from NextLeague.backend.models.models import User
+from NextLeague.backend.routes.auth import router as auth_router
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+from fastapi import APIRouter
+from fastapi import Request
+
 app = FastAPI()
 
-# Poveži bazu podataka
-Base.metadata.create_all(bind=engine)
+# Dodavanje CORS middleware-a
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # samo za frontend koji je na ovom portu
+    allow_credentials=True,
+    allow_methods=["*"],  # dozvoljava sve HTTP metode, uključujući OPTIONS
+    allow_headers=["*"],  # dozvoljava sva zaglavlja
+)
+# Dependency za kreiranje sesije
+def get_session():
+    with Session(engine) as session:
+        yield session
 
-# Dodaj router u aplikaciju
-app.include_router(router)
+# Ruta za dobavljanje svih korisnika
+@app.get("/getUsers")
+def get_users(session: Session = Depends(get_session)):
+    users = session.exec(select(User)).all()
+    return users
 
+@app.get("/user-data")
+def get_user_data(request: Request):
+    cookie = request.cookies.get("user_data")
+    return {"user_data": cookie}
+
+app.include_router(auth_router)
