@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function ProfilePage() {
   return (
     <div className="max-w-7xl mx-auto px-8 py-12">
@@ -8,8 +10,18 @@ export default function ProfilePage() {
           <div className="md:col-span-1">
             <div className="bg-[#031716] p-6 rounded-lg border border-[#0c969c]/20">
               <div className="w-32 h-32 bg-[#0a7075] rounded-full mx-auto mb-6 flex items-center justify-center">
-                <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  className="w-16 h-16 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-white text-center mb-2">John Doe</h3>
@@ -73,4 +85,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-} 
+}

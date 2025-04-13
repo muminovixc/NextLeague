@@ -1,12 +1,8 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ClientLayout({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -17,9 +13,9 @@ export default function ClientLayout({
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold text-white">NextLeague</Link>
           </div>
-          
+
           {/* Hamburger Menu Button for Mobile */}
-          <button 
+          <button
             className="md:hidden text-white p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
@@ -70,7 +66,7 @@ export default function ClientLayout({
       </div>
 
       {/* Main Content */}
-      <main className="flex-grow">
+      <main className="flex-grow bg-[#031716]">
         {children}
       </main>
 
@@ -114,4 +110,4 @@ export default function ClientLayout({
       </footer>
     </div>
   );
-} 
+}
