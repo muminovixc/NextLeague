@@ -1,6 +1,18 @@
+"use client"
 import React from 'react';
+import { useEffect } from 'react';
 
 export default function LeaguePage() {
+  useEffect(() => {
+    fetch('http://localhost:8000/user-data', {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('Cookie s backend-a:', data.user_data);
+      })
+      .catch(err => console.error('Greška pri dohvatu cookie:', err));
+  }, []);
   return (
     <div className="max-w-7xl mx-auto px-8 py-12">
       <h1 className="text-4xl font-bold text-white mb-6">League Management</h1>
