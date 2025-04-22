@@ -13,5 +13,3 @@ class User(SQLModel, table=True):
     email: str
     password: str
     phone_number: str
-
-    
