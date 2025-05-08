@@ -2,6 +2,7 @@
 "use client";
 import Sidebar from '../../components/sidebar/sidebar';
 import Footer from '../../components/footer/footer';
+import Button from '../../components/button/button';
 
 export default function HomePage() {
   return (
@@ -9,6 +10,9 @@ export default function HomePage() {
       <Sidebar/>
       <main className={`flex-grow bg-[#031716] 'md:pl-64'`}>
           <h1>homepage</h1>
+
+          <Button onClick={() => alert("Kliknuto!")}>Dugme</Button>
+
 
           
         </main>
