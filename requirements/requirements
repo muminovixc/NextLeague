@@ -2,5 +2,6 @@ pip install fastapi uvicorn
 pip install sqlmodel
 pip install psycopg2
 pip install pydantic[email]
+npm install lucide-react
 # za pokretanje je :  uvicorn backend.main:app --reload
 #za pokretanje frontenda npm run dev( prijasnje se mora instalirati npm install)
