@@ -3,3 +3,4 @@ pip install sqlmodel
 pip install psycopg2
 pip install pydantic[email]
 # za pokretanje je :  uvicorn backend.main:app --reload
+#za pokretanje frontenda npm run dev( prijasnje se mora instalirati npm install)
