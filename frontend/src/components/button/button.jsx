@@ -8,10 +8,13 @@ export default function Button({ children, onClick, type = "button" }) {
       <button
         type={type}
         onClick={onClick}
-        className="bg-[#0c969c] hover:bg-[#0a7075] active:bg-[#032f30] text-white font-semibold px-6 py-2 rounded-xl shadow-md transition-all duration-200"
+        className="group relative inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#274d60] text-white font-semibold transition-all duration-300 
+         hover:bg-[#0c969c] focus:outline-none overflow-hidden"
       >
-        {children}
+        <span className="absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 transition duration-300 blur-sm"></span>
+        <span className="relative z-10">{children}</span>
       </button>
     );
   }
+  
   
