@@ -3,20 +3,28 @@
 import Sidebar from '../../components/sidebar/sidebar';
 import Footer from '../../components/footer/footer';
 import Button from '../../components/button/button';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    };
+
+    const userCookie = getCookie('user_data');
+    setUser(userCookie);
+
+    console.log(userCookie)
+  }, []);
+
   return (
-    <div className="homepage min-h-screen flex flex-col">
-      <Sidebar/>
-      <main className={`flex-grow bg-[#031716] 'md:pl-64'`}>
-          <h1>homepage</h1>
-
-          <Button onClick={() => alert("Kliknuto!")}>Dugme</Button>
-
-
-          
-        </main>
-        <Footer/>
+    <div>
+      <h1>Home Page</h1>
+      <p>User: {user}</p>
     </div>
   );
 }

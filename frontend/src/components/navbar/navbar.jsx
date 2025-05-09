@@ -63,7 +63,7 @@ export default function ClientLayout({ children }) {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-white hover:text-[#6ba3be]">Sign In</button>
+            <Link href="/login" className="text-white hover:text-[#6ba3be]">Login</Link>
             <button className="bg-[#0c969c] text-white px-6 py-2 rounded-md hover:bg-[#0a7075]">
               Get Started
             </button>
