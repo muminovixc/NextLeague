@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { registerUser } from '@/lib/api'; // Pretpostavljam da imaš ovu funkciju
+import { registerUser } from '../../lib/api'; // Pretpostavljam da imaš ovu funkciju
 
 export default function RegisterPage() {
   const [form, setForm] = useState({

@@ -4,7 +4,7 @@ from datetime import date
 #OVO SU TABELE U BAZI PODATAKA, SVAKA TABELA SE MORA OVAKO PREDSTAVITI
 
 class User(SQLModel, table=True):
-    __tablename__ = "USER"  # PostgreSQL prihvata i velika slova, ali bolje je koristiti mala i snake_case
+    __tablename__ = "users"  # PostgreSQL prihvata i velika slova, ali bolje je koristiti mala i snake_case
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
