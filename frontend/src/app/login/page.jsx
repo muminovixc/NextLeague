@@ -19,7 +19,7 @@ export default function LoginPage() {
       console.log('Login successful:', data);
 
       // npr. redirectuj na dashboard ili home
-      router.push('/');
+      router.push('/homepage');
     } catch (err) {
       setError(err.message);
     }
