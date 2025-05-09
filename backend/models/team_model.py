@@ -1,10 +1,14 @@
-from sqlalchemy import Column, Integer, ForeignKey,String
-from database import Base
+from sqlmodel import SQLModel, Field
+from typing import Optional
+from sqlmodel import Relationship
 
-class Club(Base):
-    __tablename__ = "club"
-    id = Column(Integer,primary_key=True, index = True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    team_id = Column(Integer,ForeignKey("teams.id"))
-    role = Column(String, default = "player")
-    status= Column(String , default = "pending") #ovo sam stavio da bi ono kada posaljes zahtjev nekom klubu da bude pending dok ga ne odobre
+class Team(SQLModel, table=True):
+    __tablename__ = "team"
+    
+    team_id: Optional[int] = Field(default=None, primary_key=True)
+    moderator_user_id: int
+    team_logo: Optional[str] = Field(default=None)
+    team_sport: str = Field(max_length=100)  
+    country: str = Field(max_length=100)
+    team_identification: str = Field(max_length=255)  
+
