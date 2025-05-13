@@ -3,4 +3,5 @@ pip install sqlmodel
 pip install psycopg2
 pip install pydantic[email]
 npm install lucide-react
+npm install @heroicons/react  // za ikone
 # za pokretanje je :  uvicorn backend.main:app --reload
