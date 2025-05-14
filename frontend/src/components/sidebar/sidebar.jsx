@@ -61,10 +61,10 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              href="/club"
+              href="/team"
               className="flex items-center gap-3 p-2 rounded hover:bg-[#0e2e2d] transition"
             >
-              <Building2 size={18} /> Club
+              <Building2 size={18} /> Team
             </Link>
           </li>
           <li>
