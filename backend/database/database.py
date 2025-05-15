@@ -1,5 +1,4 @@
 from sqlmodel import create_engine
-from sqlalchemy.orm import sessionmaker, Session
 
 
 # Ispravan connection string (bez ?ssl=require)
@@ -11,13 +10,3 @@ engine = create_engine(
     echo=True,
     connect_args={"sslmode": "require"}
 )
-
-# ovo mi je trebalo da se konektujem na bazu 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-def get_db():
-    db: Session = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
