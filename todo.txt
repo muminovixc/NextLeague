@@ -1,0 +1,17 @@
+staviti rutu kad pritisnem u leaguesstatistic na team da me vodi na rutu /team/viewTeam/:id
+
+
+
+Bolja praksa
+1-U servisu uzmeš podatke iz baze.
+2-Mapiraš te podatke u Pydantic schema modele (koji definišu tačno šta i kako vraćaš).
+3-Vracas kontroleru te podatke mapirane iz servisa
+
+MORAJU ISTA IMENA ATRIBUTI U SHEMI I MODELU BITI
+
+Vraćaš te schema modele kao odgovor API-ja.
+
+ZASTO MORAJU BITI ISTA IMENA:
+-----------Kad koristiš Pydantic from_orm, imena atributa u ORM modelu (baza/SQLAlchemy model) i u Pydantic schema modelu moraju biti ista — da bi Pydantic mogao da "mapira" ta polja automatski.
+
+Ako se imena razlikuju, neće znati šta gde da ubaci.----------------------
