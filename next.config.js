@@ -4,6 +4,9 @@ const nextConfig = {
     domains: [],
     unoptimized: true,
   },
+  experimental: {
+    appDir: true,
+  },
 }
 
-module.exports = nextConfig 
+module.exports = nextConfig

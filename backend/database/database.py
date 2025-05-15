@@ -1,6 +1,7 @@
 from sqlmodel import create_engine
 from sqlalchemy.orm import sessionmaker
 
+
 # Ispravan connection string (bez ?ssl=require)
 postgresql_url = "postgresql://avnadmin:AVNS_6bBNmjONeM3B4D3MfDr@next-league-next-league.b.aivencloud.com:14290/defaultdb?sslmode=require"
 
