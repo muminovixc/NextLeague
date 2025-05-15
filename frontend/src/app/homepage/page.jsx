@@ -4,8 +4,10 @@ import Sidebar from '../../components/sidebar/sidebar';
 import Footer from '../../components/footer/footer';
 import Button from '../../components/button/button';
 import { useEffect, useState } from 'react';
-import CardsGrid from '../../components/homepage_card/homepage_card_grid';
-import LeagueGrid from '../../components/homepage_card/leagueCard_grid';
+import CardsGrid from '../../components/homepage_components/homepage_card_grid';
+import LeagueGrid from '../../components/homepage_components/leagueCard_grid';
+import SearchBar from '../../components/homepage_components/searchbar';
+import TeamsGrid from '../../components/homepage_components/team_card_grid';
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
@@ -35,7 +37,9 @@ export default function HomePage() {
   return (
 
     
-    <div className="p-6 mt-6">
+    <div>
+      <SearchBar />
+      <div className="p-6 pt-10">
         {/*POČETAK*/}
       <title>Homepage</title>
       <h1 className="text-3xl font-semibold text-white">
@@ -64,16 +68,18 @@ export default function HomePage() {
 
   {/* DESNA STRANA TEAMS */}
   <div className="w-full md:w-1/2 p-4">
-    <div className="flex justify-between items-center mt-5 px-5">
+    <div className="flex justify-between items-center mt-5 px-5 pb-5">
       <p className="text-3xl font-semibold text-white">Your teams</p>
       <a href="/team" className="text-blue-400 hover:underline">view all</a>
     </div>
+     <TeamsGrid />
   </div>
+  
 </div>
 
     
 
-      
+      </div>
     </div>
   );
 }

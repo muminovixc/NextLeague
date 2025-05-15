@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Card from './homepage_card';
+
 import { TrophyIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/outline';
+import Card from './homepage_card';
 
 const CardsGrid = () => {
   const [cards, setCards] = useState([]);
@@ -30,16 +31,16 @@ const CardsGrid = () => {
 
 return (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <Card
+     <a href="/league" className="block"><Card
       icon={TrophyIcon}
       title="Number of leagues"
       number={cards.leagues || "loading..."} 
-    />
-    <Card
+    /></a>
+   <a href="/team" className="block"> <Card
       icon={UsersIcon}
       title="Number of teams"
       number={cards.teams || "loading..."} 
-    />
+    /></a> 
   </div>
 );
 };
