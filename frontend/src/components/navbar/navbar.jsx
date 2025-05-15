@@ -42,7 +42,7 @@ export default function ClientLayout({ children }) {
           {isMenuOpen && (
             <div className="absolute top-full left-0 right-0 bg-[#032f30] md:hidden p-4 space-y-4 z-50 border-t border-[#0c969c]">
               <Link href="/league" className="block text-white hover:text-[#6ba3be] py-2 px-4">League</Link>
-              <Link href="/club" className="block text-white hover:text-[#6ba3be] py-2 px-4">Club</Link>
+              <Link href="/team" className="block text-white hover:text-[#6ba3be] py-2 px-4">Team</Link>
               <Link href="/vip" className="block text-white hover:text-[#6ba3be] py-2 px-4">VIP</Link>
               <Link href="/profile" className="block text-white hover:text-[#6ba3be] py-2 px-4">My Profile</Link>
               <div className="pt-4 border-t border-[#0c969c]">
@@ -57,7 +57,7 @@ export default function ClientLayout({ children }) {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/league" className="text-white hover:text-[#6ba3be]">League</Link>
-            <Link href="/club" className="text-white hover:text-[#6ba3be]">Club</Link>
+            <Link href="/team" className="text-white hover:text-[#6ba3be]">Team</Link>
             <Link href="/vip" className="text-white hover:text-[#6ba3be]">VIP</Link>
             <Link href="/profile" className="text-white hover:text-[#6ba3be]">My Profile</Link>
           </div>

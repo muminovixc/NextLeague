@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/league/page.jsx", "src/app/profile/page.jsx", "src/app/client-layout.jsx", "src/app/vip/page.jsx", "src/app/club/page.jsx", "src/app/page.jsx", "src/app/layout.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/league/page.jsx", "src/app/profile/page.jsx", "src/app/client-layout.jsx", "src/app/vip/page.jsx", "src/app/team/page.jsx", "src/app/page.jsx", "src/app/layout.jsx"],
   "exclude": ["node_modules"]
 }
