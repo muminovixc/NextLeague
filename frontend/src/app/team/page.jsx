@@ -1,70 +1,114 @@
-"use client"
 
-import React, { useEffect, useState } from 'react';
+'use client';
+import { useEffect, useState } from 'react';
 
-export default function ClubPage() {
-  const [teams, setTeams] = useState([]);
-  const [joinCode, setJoinCode] = useState('');
-  const [selectedTeamId, setSelectedTeamId] = useState(null);
+export default function ClubsPage() {
+  const [clubs, setClubs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState('');
+  const [editingClubId, setEditingClubId] = useState(null);
 
-  // Simulacija fetch-a (kasnije zamijeni s API pozivom)
+  // Funkcija za učitavanje klubova
+  const fetchClubs = async () => {
+    setLoading(true);
+    const res = await fetch('http://localhost:8000/team');
+    const data = await res.json();
+    setClubs(data); // Postavi učitane klubove u stanje
+    setLoading(false);
+  };
+
   useEffect(() => {
-    // Dummy podaci umjesto fetch-a
-    setTeams([
-      { id: 1, name: 'Red Dragons', description: 'Seniors Team', code: 'RD123' },
-      { id: 2, name: 'Blue Sharks', description: 'Juniors Team', code: 'BS456' },
-    ]);
+    fetchClubs();
   }, []);
 
-  const handleJoin = () => {
-    if (!selectedTeamId || !joinCode) {
-      alert('Please enter a validthe Team Code');
-      return;
-    }
-    // Tu će ići fetch prema backendu
-   // alert(`Poslat zahtjev za učlanjenje u tim ID: ${selectedTeamId} s kodom: ${joinCode}`);
+  // Funkcija za kreiranje ili ažuriranje kluba
+  const handleCreateOrUpdate = async () => {
+    const method = editingClubId ? 'PUT' : 'POST';
+    const url = editingClubId
+      ? `http://localhost:8000/clubs/${editingClubId}`
+      : 'http://localhost:8000/clubs/';
+
+    await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+
+    setName('');
+    setEditingClubId(null);
+    fetchClubs(); // Ažuriraj listu klubova nakon dodavanja ili uređivanja
+  };
+
+  // Funkcija za uređivanje kluba
+  const handleEdit = (club) => {
+    setName(club.name);
+    setEditingClubId(club.id);
+  };
+
+  // Funkcija za brisanje kluba
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:8000/clubs/${id}`, { method: 'DELETE' });
+    fetchClubs(); // Ažuriraj listu klubova nakon brisanja
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12 text-white">
-      <h1 className="text-4xl font-bold mb-8">Join a team</h1>
+    <div className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Klubovi</h1>
 
-
-      <div className="bg-[#031716] p-6 rounded-lg border border-[#0c969c]/20">
-        <label className="block mb-2 text-lg text-[#6ba3be]">Enter the Team code here:</label>
+      <div className="mb-6">
         <input
           type="text"
-          value={joinCode}
-          onChange={(e) => setJoinCode(e.target.value)}
-          className="w-full p-3 rounded-md text-white mb-4"
-          placeholder="Example: RD123"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Unesi ime kluba"
+          className="border p-2 rounded mr-2"
         />
         <button
-          onClick={handleJoin}
-          className="bg-[#0c969c] text-white px-6 py-3 p-6 rounded-md hover:bg-[#0a7075]"
+          onClick={handleCreateOrUpdate}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          Send a join request
+          {editingClubId ? 'Ažuriraj klub' : 'Dodaj klub'}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 p-6 md:grid-cols-2 gap-6 mb-8">
-        {teams.map((team) => (
-          <div
-            key={team.id}
-            onClick={() => setSelectedTeamId(team.id)}
-            className={`p-6 rounded-lg cursor-pointer border transition ${
-              selectedTeamId === team.id
-                ? 'bg-[#0c969c] border-[#0c969c]'
-                : 'bg-[#031716] border-[#0c969c]/30 hover:border-[#0c969c]'
-            }`}
-          >
-            <h2 className="text-2xl font-semibold">{team.name}</h2>
-            <p className="text-[#6ba3be]">{team.description}</p>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <p>Učitavanje klubova...</p>
+      ) : (
+        <ul className="space-y-4">
+          {clubs.map((club) => (
+            <li key={club.id} className="border p-4 rounded">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">{club.name}</span>
+                <div className="space-x-2">
+                  <button
+                    onClick={() => handleEdit(club)}
+                    className="text-blue-500"
+                  >
+                    Uredi
+                  </button>
+                  <button
+                    onClick={() => handleDelete(club.id)}
+                    className="text-red-500"
+                  >
+                    Obriši
+                  </button>
+                </div>
+              </div>
 
-      
+              {/* Prikaz igrača */}
+              {club.players && club.players.length > 0 && (
+                <ul className="ml-4 mt-2 list-disc">
+                  {club.players.map((player) => (
+                    <li key={player.id}>
+                      {player.name} – {player.position}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

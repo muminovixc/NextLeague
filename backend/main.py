@@ -5,6 +5,7 @@ from database.database import engine
 from models.user_model import User
 from controllers.auth_controller import router as auth_router
 from controllers.league_controller import router as league_router
+from controllers.team_controller import router as team_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -25,3 +26,4 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(league_router)
+app.include_router(team_router)
