@@ -1,24 +1,27 @@
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session
-from schemas.team_schema import TeamCreate
+from repositories.team_repository import TeamRepository
+from schemas.team_schema import TeamCreate, TeamUpdate
+from sqlalchemy.orm import Session
 from models.team_model import Team
-from repositories import team_repository
+from typing import List, Optional
 
+class TeamService:
 
-def create_team(db: Session, team_data: TeamCreate):
-    team = Team(**team_data.dict())
-    try:
-        return team_repository.create_team(db, team)
-    except IntegrityError:
-        raise ValueError("Team with that identification already exists.")
+    @staticmethod
+    def create_team(db: Session, team: TeamCreate) -> Team:
+        return TeamRepository.create_team(db, team)
 
+    @staticmethod
+    def get_team_by_id(db: Session, team_id: int) -> Optional[Team]:
+        return TeamRepository.get_team_by_id(db, team_id)
 
-def list_teams(db: Session):
-    return team_repository.get_all_teams(db)
+    @staticmethod
+    def get_teams(db: Session, skip: int = 0, limit: int = 100) -> List[Team]:
+        return TeamRepository.get_teams(db, skip, limit)
 
+    @staticmethod
+    def update_team(db: Session, team_id: int, team_update: TeamUpdate) -> Optional[Team]:
+        return TeamRepository.update_team(db, team_id, team_update)
 
-def retrieve_team(db: Session, team_id: int):
-    team = team_repository.get_team_by_id(db, team_id)
-    if not team:
-        raise ValueError("Team not found.")
-    return team
+    @staticmethod
+    def delete_team(db: Session, team_id: int) -> bool:
+        return TeamRepository.delete_team(db, team_id)
