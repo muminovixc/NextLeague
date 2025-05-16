@@ -10,7 +10,7 @@ class UserResponse(BaseModel):
     phone_number: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCounts(BaseModel):
@@ -26,4 +26,18 @@ class LeagueRead(BaseModel):
     access: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+
+class TeamRead(BaseModel):
+    team_id: int
+    name: str
+    team_sport: str
+    moderator_user_id: int
+    country: str
+    team_logo: str
+    team_identification: str
+
+    class Config:
+        from_attributes = True       

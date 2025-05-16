@@ -17,7 +17,7 @@ const LeaguesGrid = () => {
      <div className="flex flex-wrap w-full">
     {leagues.slice(0, 2).map((league) => (
       <div className="w-full md:w-1/2 p-4" key={league.league_id}>
-        <a href={`/league/view/${league.league_id}`}>
+        <a href={`/league/view/${league.league_id}`} >
       <LeagueCard
         href={`/league/view/${league.league_id}`}
         sport={league.sport}
@@ -25,7 +25,7 @@ const LeaguesGrid = () => {
         role="Moderator"
         teamCount={league.number_of_teams}
         isPublic={league.access === "PUBLIC"}
-      />
+      /> 
     </a>
       </div>
     ))}

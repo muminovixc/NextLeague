@@ -34,12 +34,12 @@ return (
      <a href="/league" className="block"><Card
       icon={TrophyIcon}
       title="Number of leagues"
-      number={cards.leagues || "loading..."} 
+      number={cards.leagues || "No leagues found"}  
     /></a>
    <a href="/team" className="block"> <Card
       icon={UsersIcon}
       title="Number of teams"
-      number={cards.teams || "loading..."} 
+      number={cards.teams || "No teams found"} 
     /></a> 
   </div>
 );

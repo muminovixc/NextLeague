@@ -23,6 +23,7 @@ app.add_middleware(
     allow_methods=["*"],  # dozvoljava sve HTTP metode, uključujući OPTIONS
     allow_headers=["*"],  # dozvoljava sva zaglavlja
 )
+print("FastAPI app se pokrenula")
 
 
 app.include_router(auth_router)

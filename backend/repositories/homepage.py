@@ -14,3 +14,6 @@ def count_teams_by_user(session: Session, user_id: int) -> int:
 
 def get_leagues_by_user(db: Session, user_id: int):
     return db.query(League).filter(League.moderator_user_id == user_id).all()
+
+def get_teams_by_user(db: Session, user_id: int):
+    return db.query(Team).filter(Team.moderator_user_id == user_id).all()

@@ -1,43 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TeamCard from './team_card';
 
 const TeamsGrid = () => {
-  // Simulirani podaci
-  const teams = [
-    {
-      team_id: 1,
-      name: 'FK Zvezdara',
-      sport: 'Fudbalski klub',
-      league_name: 'Amaterska liga Beograd',
-      role: 'Moderator tima',
-    },
-    {
-      team_id: 2,
-      name: 'KK Orlovi',
-      sport: 'Košarkaški klub',
-      league_name: 'Rekreativna košarkaška liga',
-      role: 'Igrač',
-    },
-    {
-      team_id: 3,
-      name: 'OK Mladost',
-      sport: 'Odbojkaški klub',
-      league_name: 'Prva odbojkaška liga',
-      role: 'Trener',
-    },
-  ];
-
+  const [team, setTeam] = useState([]);
+      useEffect(() => {
+      fetch("http://localhost:8000/my-teams", {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => setTeam(data))
+        .catch((err) => console.error("Greška:", err));
+    }, []);
+  
+    console.log(team);
   return (
     <div className="w-full">
-      {teams.slice(0, 2).map((team) => (
-        <TeamCard
+      {team.slice(0, 2).map((team) => (
+        <a href={`/team/view/${team.team_id}`} key={team.team_id}> 
+      <TeamCard
           key={team.team_id}
           teamName={team.name}
-          description={`${team.sport} • ${team.league_name}`}
-          role={team.role}
-          href={`/team/view/${team.team_id}`}
-          canEdit={team.role === 'Moderator tima'}
-        />
+          description={`${team.team_sport} • ${team.country}`}
+          
+          teamImage={team.team_logo}
+        /></a>
       ))}
     </div>
   );

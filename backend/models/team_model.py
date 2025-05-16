@@ -7,4 +7,5 @@ class Team(SQLModel, table=True):
     team_logo: Optional[str]
     team_sport: str
     country: str
+    name: str
     team_identification: Optional[str] = Field(unique=True, index=True)
