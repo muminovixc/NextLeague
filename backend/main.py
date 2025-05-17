@@ -12,6 +12,7 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from fastapi import Request
+from controllers.vip_controller import router as vip_router
 
 app = FastAPI()
 
@@ -30,3 +31,4 @@ app.include_router(auth_router)
 app.include_router(league_router)
 app.include_router(team_router)
 app.include_router(homepage_router)
+app.include_router(vip_router) 
