@@ -26,9 +26,9 @@ app.add_middleware(
 )
 print("FastAPI app se pokrenula")
 
-
+ 
 app.include_router(auth_router)
-app.include_router(league_router)
-app.include_router(team_router)
+app.include_router(league_router) 
+app.include_router(team_router) 
 app.include_router(homepage_router)
-app.include_router(vip_router) 
+app.include_router(vip_router)   

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session
 from schemas.homepage import UserResponse
 from schemas.homepage import UserCounts
+from pydantic import BaseModel
 from services import homepage as user_service
 from services import homepage as homepage_service
 from database.database import get_session 
@@ -49,3 +50,20 @@ async def create_checkout_session(request: Request):
     )
 
     return {"sessionId": checkout_session["id"]}
+
+class SessionVerifyRequest(BaseModel):
+    sessionId: str
+
+@router.post("/verify-session")
+async def verify_session(data: SessionVerifyRequest):
+    try:
+        session = stripe.checkout.Session.retrieve(data.sessionId)
+
+        if session.payment_status == "paid":
+            # Možeš ovdje pronaći korisnika po e-mailu i označiti kao Premium
+            return {"valid": True, "customerEmail": session.customer_email}
+        else:
+            return {"valid": False, "message": "Plaćanje nije uspješno"}
+
+    except stripe.error.InvalidRequestError:
+        raise HTTPException(status_code=400, detail="Nevažeći session ID")
