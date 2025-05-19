@@ -6,3 +6,4 @@ class TeamMembers(SQLModel, table=True):
 
     team_id: int = Field(foreign_key="team.team_id", primary_key=True)
     user_id: int = Field(foreign_key="users.id", primary_key=True)
+    

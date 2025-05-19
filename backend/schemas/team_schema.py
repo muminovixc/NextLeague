@@ -55,3 +55,13 @@ class TeamStatisticOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class TeamMemberSchema(BaseModel):
+    id: int
+    name: str
+    surname: str
+
+    class Config:
+        from_attributes = True
+

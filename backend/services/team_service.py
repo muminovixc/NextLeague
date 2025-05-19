@@ -17,6 +17,19 @@ def getMyTeams(db: Session, token: str):
     except Exception as e:
         raise Exception(f"Token error: {str(e)}")
     
+
+def getTeamMembers(db: Session, team_id: int, token: str):
+    try:
+        print(f"Received token: {token}")
+        statement = decode_access_token(token)
+        user_id = statement.get("id")
+        if not user_id:
+            raise Exception("User ID not found in token.")
+        print(f"Decoded user_id: {user_id}")
+    except Exception as e:
+        raise Exception(f"Token error: {str(e)}")
+    return TeamRepository.getTeamMembers(db, team_id)
+
 def getTeamById(db: Session, team_id: int):
     return TeamRepository.getTeamById(db, team_id)
 
@@ -25,3 +38,5 @@ def getTeamStatistic(db: Session, team_id: int):
 
 def getAllTeams(db: Session):
     return TeamRepository.getAllTeams(db)
+
+

@@ -2,7 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlmodel import Session
 from typing import List
 from services import team_service
+from models.team_members_models import TeamMembers
+from models.user_model import User
 from schemas.team_schema import TeamStatisticOut
+from schemas.team_schema import TeamMemberSchema
 from database.database import engine
 
 
@@ -46,3 +49,15 @@ def getTeamById(team_id: int, request: Request, session: Session = Depends(get_d
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     return team_service.getTeamById(session, team_id)
+
+
+@router.get("/{team_id}/getTeamMembers", response_model=List[TeamMemberSchema])
+def getTeamMembers(team_id: int, request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get('access_token')
+
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+
+    
+    return team_service.getTeamMembers(db, team_id, token)

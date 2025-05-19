@@ -10,7 +10,8 @@ class Team(SQLModel, table=True):
     team_sport: str
     country: str
     team_identification: Optional[str] = Field(unique=True, index=True)
-
+    name: str
+    
 class TeamStatistic(SQLModel, table=True):
     __tablename__ = "team_statistic"
 
