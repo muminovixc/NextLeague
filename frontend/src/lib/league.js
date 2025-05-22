@@ -114,6 +114,6 @@ export async function deleteMyLeague(league_id) {
 }
 
 export async function sendRequestForLeague(team_id) {
-  
+
 }
 
