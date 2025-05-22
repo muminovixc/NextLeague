@@ -1,6 +1,13 @@
 staviti rutu kad pritisnem u leaguesstatistic na team da me vodi na rutu /team/viewTeam/:id
 
 
+rijesiti ovaj problem kad kliknem view na ligi : Error: Route "/league/view/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ViewLeaguePage (page.jsx:7:11)
+staviti limit na ucitavanju liga, tj ne ucitavati sve odjednom
+
+
+SEND REQUEST: kad pritisne send request treba izaci prozor sa timovima od korisnika tj od njegovih timova gdje je moderator
+i da izabere tim s kojim salje zahtjev da se prijavi u ligu
 
 Bolja praksa
 1-U servisu uzmeš podatke iz baze.
@@ -15,3 +22,13 @@ ZASTO MORAJU BITI ISTA IMENA:
 -----------Kad koristiš Pydantic from_orm, imena atributa u ORM modelu (baza/SQLAlchemy model) i u Pydantic schema modelu moraju biti ista — da bi Pydantic mogao da "mapira" ta polja automatski.
 
 Ako se imena razlikuju, neće znati šta gde da ubaci.----------------------
+
+
+KAD HOCEMO NA GIT DA PUSHAMO FAJLOVE
+1-git add .
+2-git commit -m "Kom"
+(ovo je da se sacuvaju nase promjene koje smo radili)
+3-git pull origin main (da pullamo neke fajlove koje nemamo i ako imamo konflikte rucno udjemo u fajl u accept both changes)
+4-git add fajl/fajl (ili git add . kad uklonimo sve konflikte rucno)
+5- git commit -m "Zavrseno merge"
+6- sad mozemo git push origin main
