@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request,HTTPException
 from sqlmodel import Session
 from services import league_service
+from models.league_model import League
 from schemas.league_schema import TeamStatisticOut, LeagueCreate
 from database.database import engine
 
@@ -20,12 +21,12 @@ def getMyLeagues(request: Request, session: Session = Depends(get_session)):
     return league_service.getMyLeagues(session, token)
 
 @router.get("/getAllLeagues")
-def getAllLeagues(request: Request, session: Session = Depends(get_session)):
+def getAllLeagues(request: Request, limit: int = 10, offset: int = 0, session: Session = Depends(get_session)):
     token = request.cookies.get('access_token')
 
     if not token:
         raise HTTPException(status_code=401, detail="User not authenticated")
-    return league_service.getAllLeagues(session)
+    return league_service.getAllLeagues(session, limit = limit, offset = offset)
 
 @router.get("/getLeaguesStatistic/{league_id}", response_model=list[TeamStatisticOut])
 def getLeaguesStatistic(league_id: int, request: Request, session: Session = Depends(get_session)):
@@ -45,3 +46,10 @@ def deleteMyLeague(league_id: int, request: Request, session: Session = Depends(
     if not token:
         raise HTTPException(status_code=401, detail="User not authenticated")
     return league_service.deleteMyLeague(session, token, league_id)
+
+@router.get("/getLeagueById/{league_id}", response_model = League)
+def getLeagueById(league_id: int, request: Request, session: Session = Depends(get_session)):
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    return league_service.getLeagueById(session,token,league_id)

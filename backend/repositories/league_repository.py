@@ -8,8 +8,8 @@ def getMyLeagues(db: Session, user_id: int):
     results = db.exec(statement)
     return results.all()
 
-def getAllLeagues(db: Session):
-    statement = select(League)
+def getAllLeagues(db: Session, limit: int, offset: int):
+    statement = select(League).offset(offset).limit(limit)
     results = db.exec(statement)
     return results.all()
 
@@ -43,3 +43,9 @@ def deleteMyLeague(session: Session, user_id: int, league_id: int) -> bool:
     session.commit()
     return True
     
+def getLeagueById(session: Session, league_id: int) -> League | None:
+    statement = select(League).where(
+        League.league_id == league_id,
+    )
+    result = session.exec(statement).first()
+    return result

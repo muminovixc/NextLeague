@@ -5,6 +5,7 @@ rijesiti ovaj problem kad kliknem view na ligi : Error: Route "/league/view/[id]
     at ViewLeaguePage (page.jsx:7:11)
 staviti limit na ucitavanju liga, tj ne ucitavati sve odjednom
 
+staviti sortiranje ligi na backend zato sto ih ima puno i onda ne valja algoritam na frontendu
 
 SEND REQUEST: kad pritisne send request treba izaci prozor sa timovima od korisnika tj od njegovih timova gdje je moderator
 i da izabere tim s kojim salje zahtjev da se prijavi u ligu
