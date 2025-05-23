@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 const getEmojiForSport = (sport) => {
   switch (sport) {
@@ -55,12 +56,11 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
               Send Request
             </button>
           )}
-          <button
-            onClick={() => router.push(`/league/view/${league.league_id}`)}
-            className="border border-[#0c969c] text-[#0c969c] px-4 py-2 rounded-md hover:bg-[#0c969c]/10"
-          >
-            View
-          </button>
+          <Link href={`/league/view/${league.league_id}`}>
+            <button className="border border-[#0c969c] text-[#0c969c] px-4 py-2 rounded-md hover:bg-[#0c969c]/10 w-full text-left">
+              View
+            </button>
+          </Link>
           {!showRequest && (
             <button
               onClick={() => onDelete(league.league_id)}
