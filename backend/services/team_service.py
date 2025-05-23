@@ -1,27 +1,60 @@
-from repositories.team_repository import TeamRepository
+from repositories import team_repository as TeamRepository
 from schemas.team_schema import TeamCreate, TeamUpdate
-from sqlalchemy.orm import Session
-from models.team_model import Team
+from sqlmodel import Session
+from models import team_model
 from typing import List, Optional
+from auth.jwt_utils import decode_access_token
 
-class TeamService:
+def getMyTeams(db: Session, token: str):  
+    try:
+        print(f"Received token: {token}")
+        statement = decode_access_token(token)
+        user_id = statement.get("id")
+        if not user_id:
+            raise Exception("User ID not found in token.")
+        print(f"Decoded user_id: {user_id}")
+        return TeamRepository.getMyTeams(db, user_id)
+    except Exception as e:
+        raise Exception(f"Token error: {str(e)}")
+    
+def GetAllTeams(db: Session,token: str):
+    try:
+        print(f"Received token: {token}")
+        statement = decode_access_token(token)
+        user_id = statement.get("id")
+        if not user_id:
+            raise Exception("User ID not found in token.")
+        print(f"Decoded user_id: {user_id}")
+    except Exception as e:
+        raise Exception(f"Token error: {str(e)}")
+    return TeamRepository.GetAllTeams(db)
 
-    @staticmethod
-    def create_team(db: Session, team: TeamCreate) -> Team:
-        return TeamRepository.create_team(db, team)
 
-    @staticmethod
-    def get_team_by_id(db: Session, team_id: int) -> Optional[Team]:
-        return TeamRepository.get_team_by_id(db, team_id)
+def getTeamMembers(db: Session, team_id: int, token: str):
+    try:
+        print(f"Received token: {token}")
+        statement = decode_access_token(token)
+        user_id = statement.get("id")
+        if not user_id:
+            raise Exception("User ID not found in token.")
+        print(f"Decoded user_id: {user_id}")
+    except Exception as e:
+        raise Exception(f"Token error: {str(e)}")
+    return TeamRepository.getTeamMembers(db, team_id)
 
-    @staticmethod
-    def get_teams(db: Session, skip: int = 0, limit: int = 100) -> List[Team]:
-        return TeamRepository.get_teams(db, skip, limit)
+def getTeamById(db: Session, team_id: int):
+    try:
+        print(f"Received team_id: {team_id}")
+        if not team_id:
+            raise Exception("Team ID not found.")
+        print(f"Decoded team_id: {team_id}")
+    except Exception as e:
+        raise Exception(f"Token error: {str(e)}")
+    return TeamRepository.getTeamById(db, team_id)
 
-    @staticmethod
-    def update_team(db: Session, team_id: int, team_update: TeamUpdate) -> Optional[Team]:
-        return TeamRepository.update_team(db, team_id, team_update)
+def getTeamStatistic(db: Session, team_id: int):
+    return TeamRepository.getTeamStatistic(db, team_id)
 
-    @staticmethod
-    def delete_team(db: Session, team_id: int) -> bool:
-        return TeamRepository.delete_team(db, team_id)
+
+
+
