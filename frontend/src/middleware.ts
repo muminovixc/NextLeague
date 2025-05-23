@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const protectedRoutes = ['/profile','/league','/team','/homepage','/vip'] // možeš dodati više ruta ovdje
 
   if (protectedRoutes.includes(request.nextUrl.pathname)) {
-    const cookie = request.cookies.get('user_data')
+    const cookie = request.cookies.get('access_token')
     console.log("NULLLL JE")
     console.log(cookie)
     if (!cookie) {

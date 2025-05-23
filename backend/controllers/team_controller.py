@@ -28,12 +28,12 @@ def getMyTeams(request: Request, session: Session = Depends(get_db)):
     return team_service.getMyTeams(session, token)
 
 @router.get("/getAllTeams")
-def getAllTeams(request: Request, session: Session = Depends(get_db)):
+def GetAllTeams(request: Request, session: Session = Depends(get_db)):
     token = request.cookies.get('access_token')
 
     if not token:
         raise HTTPException(status_code=401, detail="User not authenticated")
-    return team_service.getAllTeams(session)
+    return team_service.GetAllTeams(session,token)
 
 @router.get("/getTeamStatistic/{team_id}", response_model=list[TeamStatisticOut])
 def getTeamStatistic(team_id: int, request: Request, session: Session = Depends(get_db)):
@@ -42,13 +42,13 @@ def getTeamStatistic(team_id: int, request: Request, session: Session = Depends(
 
 
 @router.get("/getTeamById/{team_id}")
-def getTeamById(team_id: int, request: Request, session: Session = Depends(get_db)):
+def getTeamById1111(team_id: int, request: Request, session: Session = Depends(get_db)):
     token = request.cookies.get('access_token')
 
     if not token:
         raise HTTPException(status_code=401, detail="User not authenticated")
     
-    return team_service.getTeamById(session, team_id)
+    return team_service.getTeamById1111(session, team_id)
 
 
 @router.get("/{team_id}/getTeamMembers", response_model=List[TeamMemberSchema])
@@ -61,3 +61,13 @@ def getTeamMembers(team_id: int, request: Request, db: Session = Depends(get_db)
 
     
     return team_service.getTeamMembers(db, team_id, token)
+
+
+@router.get("/view/{team_id}")
+def getTeamById(team_id: int, request: Request, session: Session = Depends(get_db)):
+    token = request.cookies.get('access_token')
+
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    return team_service.getTeamById(session, team_id)

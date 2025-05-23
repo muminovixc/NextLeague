@@ -5,7 +5,7 @@ from models.user_model import User
 from models.team_members_models import TeamMembers
 
 from typing import List, Optional
-
+# ovde uradi isti upit samo da je moderator_user_id == user_id
 
 def getMyTeams(db: Session, user_id: int):
     
