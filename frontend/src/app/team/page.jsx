@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import FootballFieldVisualization from './FootballFieldVisualization';
+import TeamCreateForm from './TeamCreateForm';
 import { getMyTeam , getTeamMembers, getAllTeams} from '../../lib/team';
 
 export default function TeamPage() {
@@ -15,6 +16,7 @@ export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [showMembers, setShowMembers] = useState(false);
   const [showAllTeams, setShowAllTeams] = useState(true);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     async function fetchTeams() {
@@ -68,6 +70,7 @@ export default function TeamPage() {
     router.push(`/team/view/${teamId}`);
   };
 
+
   const closeMembers = () => {
     setShowMembers(false);
     setSelectedTeam(null);
@@ -75,6 +78,25 @@ export default function TeamPage() {
 
   const toggleAllTeams = () => {
     setShowAllTeams(!showAllTeams);
+  };
+
+  const handleCreateTeam = () => {
+    setShowCreateForm(true);
+  };
+
+  const handleCloseCreateForm = () => {
+    setShowCreateForm(false);
+  };
+
+  const handleTeamCreated = async (newTeam) => {
+    // Refresh the teams list after creating a new team
+    try {
+      const teams = await getMyTeam();
+      setMyTeams(teams);
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error('Error refreshing teams:', error);
+    }
   };
 
   if (loading) {
@@ -117,12 +139,25 @@ export default function TeamPage() {
 
         {/* My Teams Section */}
         <div className="mb-16">
-          <div className="flex items-center mb-8">
-            <div className="h-1 flex-1 rounded-full mr-6" style={{ backgroundColor: '#0a7075' }}></div>
-            <h2 className="text-3xl font-bold whitespace-nowrap" style={{ color: '#0c969c' }}>
-              My Teams
-            </h2>
-            <div className="h-1 flex-1 rounded-full ml-6" style={{ backgroundColor: '#0a7075' }}></div>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center flex-1">
+              <div className="h-1 flex-1 rounded-full mr-6" style={{ backgroundColor: '#0a7075' }}></div>
+              <h2 className="text-3xl font-bold whitespace-nowrap" style={{ color: '#0c969c' }}>
+                My Teams
+              </h2>
+              <div className="h-1 flex-1 rounded-full ml-6" style={{ backgroundColor: '#0a7075' }}></div>
+            </div>
+            {/* Create Team Button */}
+            <button
+              onClick={handleCreateTeam}
+              className="ml-6 px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center gap-2"
+              style={{ backgroundColor: '#0c969c', color: '#031716' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Team
+            </button>
           </div>
 
           {myTeams.length === 0 ? (
@@ -132,9 +167,10 @@ export default function TeamPage() {
                    style={{ backgroundColor: '#0a7075' }}>
                 <span className="text-3xl" style={{ color: '#6ba3be' }}>⚽</span>
               </div>
-              <p className="text-xl font-medium" style={{ color: '#6ba3be' }}>
+              <p className="text-xl font-medium mb-4" style={{ color: '#6ba3be' }}>
                 No teams found
               </p>
+             
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -185,6 +221,7 @@ export default function TeamPage() {
                     </div>
                     
                     {/* Action Button */}
+                    <div className='space-y-4'>
                     <button
                       onClick={() => handleViewMembers(team)}
                       className="w-full py-3 rounded-xl font-semibold transition-all duration-200 ease-in-out transform hover:translate-y-1 hover:shadow-lg"
@@ -195,6 +232,18 @@ export default function TeamPage() {
                     >
                       View Members
                     </button>
+
+                    <button
+                        onClick={() => handleViewTeam(team.team_id || team.id)}
+                      className="w-full py-3 rounded-xl font-semibold transition-all duration-200 ease-in-out transform hover:translate-y-1 hover:shadow-lg"
+                      style={{ 
+                        backgroundColor: '#0c969c', 
+                        color: '#031716',
+                      }}
+                    >
+                      View Statistic
+                    </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -390,6 +439,14 @@ export default function TeamPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Create Team Form Modal */}
+        {showCreateForm && (
+          <TeamCreateForm 
+            onClose={handleCloseCreateForm}
+            onTeamCreated={handleTeamCreated}
+          />
         )}
       </div>
     </div>

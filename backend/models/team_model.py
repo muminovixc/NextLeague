@@ -31,7 +31,7 @@ class TeamStatistic(SQLModel, table=True):
 class TeamStatisticView(SQLModel, table=True):
     __tablename__ = "team_statistic_view"  
 
-    team_id: int = Field(primary_key=True)  # čak i ako je samo "read-only"
+    team_id: int = Field(primary_key=True)  
     team_logo: str
     team_sport: str
     country: str

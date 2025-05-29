@@ -9,7 +9,7 @@ export default function TeamView() {
     const params = useParams();
     const teamId = params.id;
     
-    const [team, setTeam] = useState(null);
+    const [teamData, setTeamData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -19,8 +19,9 @@ export default function TeamView() {
             
             try {
                 setLoading(true);
-                const teamData = await getTeamById(teamId);
-                setTeam(teamData);
+                const data = await getTeamById(teamId);
+                console.log('Received team data:', data); // Debug log
+                setTeamData(data);
                 setError(null);
             } catch (error) {
                 console.error('Error fetching team:', error);
@@ -71,7 +72,7 @@ export default function TeamView() {
         );
     }
 
-    if (!team) {
+    if (!teamData || !Array.isArray(teamData) || teamData.length === 0 || !teamData[0]) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#031716' }}>
                 <div className="text-center max-w-md mx-auto p-8">
@@ -93,9 +94,41 @@ export default function TeamView() {
         );
     }
 
+    // Destructure team and statistics data safely
+    const team = teamData[0]; // Team object
+    const statistics = teamData[1] || null; // TeamStatistic object (might be null)
+
+    // Calculate win percentage safely
+    const winPercentage = statistics?.number_of_matches_played > 0 
+        ? ((statistics.number_of_wins / statistics.number_of_matches_played) * 100).toFixed(1)
+        : 0;
+
+    // Additional safety check for team object
+    if (!team || typeof team !== 'object') {
+        return (
+            <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#031716' }}>
+                <div className="text-center max-w-md mx-auto p-8">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+                         style={{ backgroundColor: '#032f30' }}>
+                        <span className="text-2xl" style={{ color: '#6ba3be' }}>⚠️</span>
+                    </div>
+                    <h2 className="text-2xl font-bold mb-4" style={{ color: '#0c969c' }}>Invalid Data</h2>
+                    <p className="mb-6" style={{ color: '#6ba3be' }}>Team data is not in the expected format.</p>
+                    <button
+                        onClick={handleGoBack}
+                        className="px-6 py-3 rounded-xl font-semibold transition-all hover:transform hover:scale-105"
+                        style={{ backgroundColor: '#0c969c', color: '#031716' }}
+                    >
+                        Go Back
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen py-8" style={{ backgroundColor: '#031716' }}>
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Header Section */}
                 <div className="mb-8">
@@ -111,126 +144,245 @@ export default function TeamView() {
                     </button>
                 </div>
 
-                {/* Team Information Card */}
-                <div className="rounded-2xl border-2 overflow-hidden shadow-2xl"
-                     style={{ backgroundColor: '#032f30', borderColor: '#0a7075' }}>
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
-                    {/* Team Header */}
-                    <div className="p-8 text-center">
-                        <div className="flex flex-col items-center gap-8">
+                    {/* Team Information Card */}
+                    <div className="rounded-2xl border-2 overflow-hidden shadow-2xl"
+                         style={{ backgroundColor: '#032f30', borderColor: '#0a7075' }}>
+                        
+                        {/* Team Header */}
+                        <div className="p-8 text-center">
+                            <div className="flex flex-col items-center gap-6">
+                                
+                                {/* Team Logo */}
+                                {team.team_logo ? (
+                                    <div className="w-24 h-24 rounded-2xl flex items-center justify-center"
+                                         style={{ backgroundColor: '#0a7075' }}>
+                                        <img 
+                                            src={team.team_logo} 
+                                            alt={`${team.name} logo`} 
+                                            className="w-20 h-20 object-contain rounded-xl"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="w-24 h-24 rounded-2xl flex items-center justify-center"
+                                         style={{ backgroundColor: '#0a7075' }}>
+                                        <span className="text-3xl" style={{ color: '#6ba3be' }}>⚽</span>
+                                    </div>
+                                )}
+                                
+                                {/* Team Name */}
+                                <div>
+                                    <h1 className="text-3xl font-bold mb-3" style={{ color: '#0c969c' }}>
+                                        {team.name}
+                                    </h1>
+                                    <div className="inline-block px-4 py-2 rounded-full text-lg font-medium"
+                                         style={{ backgroundColor: '#0a7075', color: '#6ba3be' }}>
+                                        {team.team_sport}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Team Details */}
+                        <div className="p-6 border-t" style={{ borderColor: '#0a7075' }}>
+                            <h2 className="text-xl font-bold mb-4 text-center" style={{ color: '#0c969c' }}>
+                                Team Information
+                            </h2>
                             
-                            {/* Team Logo */}
-                            {team.team_logo ? (
-                                <div className="w-32 h-32 rounded-2xl flex items-center justify-center"
-                                     style={{ backgroundColor: '#0a7075' }}>
-                                    <img 
-                                        src={team.team_logo} 
-                                        alt={`${team.name} logo`} 
-                                        className="w-24 h-24 object-contain rounded-xl"
-                                    />
+                            <div className="space-y-4">
+                                
+                                {/* Team ID */}
+                                <div className="p-4 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3"
+                                             style={{ backgroundColor: '#0a7075' }}>
+                                            <span className="text-lg" style={{ color: '#6ba3be' }}>🆔</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold" style={{ color: '#0c969c' }}>Team ID</h3>
+                                            <p className="font-mono" style={{ color: '#6ba3be' }}>{team.team_id}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="w-32 h-32 rounded-2xl flex items-center justify-center"
-                                     style={{ backgroundColor: '#0a7075' }}>
-                                    <span className="text-4xl" style={{ color: '#6ba3be' }}>⚽</span>
+
+                                {/* Country */}
+                                <div className="p-4 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3"
+                                             style={{ backgroundColor: '#0a7075' }}>
+                                            <span className="text-lg" style={{ color: '#6ba3be' }}>🌍</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold" style={{ color: '#0c969c' }}>Country</h3>
+                                            <p style={{ color: '#6ba3be' }}>{team.country}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                            
-                            {/* Team Name */}
-                            <div>
-                                <h1 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: '#0c969c' }}>
-                                    {team.name}
-                                </h1>
-                                <div className="inline-block px-6 py-2 rounded-full text-xl font-medium"
-                                     style={{ backgroundColor: '#0a7075', color: '#6ba3be' }}>
-                                    {team.team_sport}
-                                </div>
+
+                                {/* Team Identification */}
+                                {team.team_identification && (
+                                    <div className="p-4 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
+                                        <div className="flex items-center">
+                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3"
+                                                 style={{ backgroundColor: '#0a7075' }}>
+                                                <span className="text-lg" style={{ color: '#6ba3be' }}>🏷️</span>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold" style={{ color: '#0c969c' }}>Identification</h3>
+                                                <p className="font-mono" style={{ color: '#6ba3be' }}>{team.team_identification}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Team Details */}
-                    <div className="p-8 border-t" style={{ borderColor: '#0a7075' }}>
-                        <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: '#0c969c' }}>
-                            Team Information
-                        </h2>
+                    {/* Team Statistics Card */}
+                    <div className="rounded-2xl border-2 overflow-hidden shadow-2xl"
+                         style={{ backgroundColor: '#032f30', borderColor: '#0a7075' }}>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            
-                            {/* Team ID */}
-                            <div className="p-6 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
-                                <div className="flex items-center mb-3">
-                                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-4"
-                                         style={{ backgroundColor: '#0a7075' }}>
-                                        <span className="text-xl" style={{ color: '#6ba3be' }}>🆔</span>
-                                    </div>
-                                    <h3 className="text-lg font-semibold" style={{ color: '#0c969c' }}>Team ID</h3>
-                                </div>
-                                <p className="font-mono text-xl ml-16" style={{ color: '#6ba3be' }}>
-                                    {team.team_id}
+                        {/* Statistics Header */}
+                        <div className="p-6 text-center border-b" style={{ borderColor: '#0a7075' }}>
+                            <h2 className="text-2xl font-bold" style={{ color: '#0c969c' }}>Team Statistics</h2>
+                            {statistics && (
+                                <p className="mt-2" style={{ color: '#6ba3be' }}>
+                                    Season Performance Overview
                                 </p>
-                            </div>
-
-                            {/* Sport */}
-                            <div className="p-6 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
-                                <div className="flex items-center mb-3">
-                                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-4"
-                                         style={{ backgroundColor: '#0a7075' }}>
-                                        <span className="text-xl" style={{ color: '#6ba3be' }}>🏆</span>
-                                    </div>
-                                    <h3 className="text-lg font-semibold" style={{ color: '#0c969c' }}>Sport</h3>
-                                </div>
-                                <p className="text-xl ml-16" style={{ color: '#6ba3be' }}>
-                                    {team.team_sport}
-                                </p>
-                            </div>
-
-                            {/* Country */}
-                            <div className="p-6 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
-                                <div className="flex items-center mb-3">
-                                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-4"
-                                         style={{ backgroundColor: '#0a7075' }}>
-                                        <span className="text-xl" style={{ color: '#6ba3be' }}>🌍</span>
-                                    </div>
-                                    <h3 className="text-lg font-semibold" style={{ color: '#0c969c' }}>Country</h3>
-                                </div>
-                                <p className="text-xl ml-16" style={{ color: '#6ba3be' }}>
-                                    {team.country}
-                                </p>
-                            </div>
-
-                            {/* Team Identification */}
-                            {team.team_identification && (
-                                <div className="p-6 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
-                                    <div className="flex items-center mb-3">
-                                        <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-4"
-                                             style={{ backgroundColor: '#0a7075' }}>
-                                            <span className="text-xl" style={{ color: '#6ba3be' }}>🏷️</span>
-                                        </div>
-                                        <h3 className="text-lg font-semibold" style={{ color: '#0c969c' }}>Identification</h3>
-                                    </div>
-                                    <p className="font-mono text-xl ml-16" style={{ color: '#6ba3be' }}>
-                                        {team.team_identification}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Moderator ID */}
-                            {team.moderator_user_id && (
-                                <div className="p-6 rounded-xl border" style={{ backgroundColor: '#031716', borderColor: '#0a7075' }}>
-                                    <div className="flex items-center mb-3">
-                                        <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-4"
-                                             style={{ backgroundColor: '#0a7075' }}>
-                                            <span className="text-xl" style={{ color: '#6ba3be' }}>👨‍💼</span>
-                                        </div>
-                                        <h3 className="text-lg font-semibold" style={{ color: '#0c969c' }}>Moderator ID</h3>
-                                    </div>
-                                    <p className="font-mono text-xl ml-16" style={{ color: '#6ba3be' }}>
-                                        {team.moderator_user_id}
-                                    </p>
-                                </div>
                             )}
                         </div>
+
+                        {statistics ? (
+                            <div className="p-6">
+                                {/* Key Stats Grid */}
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    
+                                    {/* Matches Played */}
+                                    <div className="text-center p-4 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className="text-3xl font-bold mb-1" style={{ color: '#0c969c' }}>
+                                            {statistics.number_of_matches_played}
+                                        </div>
+                                        <div className="text-sm font-medium" style={{ color: '#6ba3be' }}>
+                                            Matches Played
+                                        </div>
+                                    </div>
+
+                                    {/* Win Percentage */}
+                                    <div className="text-center p-4 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className="text-3xl font-bold mb-1" style={{ color: '#0c969c' }}>
+                                            {winPercentage}%
+                                        </div>
+                                        <div className="text-sm font-medium" style={{ color: '#6ba3be' }}>
+                                            Win Rate
+                                        </div>
+                                    </div>
+
+                                    {/* Total Points */}
+                                    <div className="text-center p-4 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className="text-3xl font-bold mb-1" style={{ color: '#0c969c' }}>
+                                            {statistics.points}
+                                        </div>
+                                        <div className="text-sm font-medium" style={{ color: '#6ba3be' }}>
+                                            Total Points
+                                        </div>
+                                    </div>
+
+                                    {/* Point Difference */}
+                                    <div className="text-center p-4 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className={`text-3xl font-bold mb-1 ${statistics.difference_points >= 0 ? '' : ''}`} 
+                                             style={{ color: statistics.difference_points >= 0 ? '#0c969c' : '#dc2626' }}>
+                                            {statistics.difference_points >= 0 ? '+' : ''}{statistics.difference_points}
+                                        </div>
+                                        <div className="text-sm font-medium" style={{ color: '#6ba3be' }}>
+                                            Goal Difference
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Match Results */}
+                                <div className="space-y-3">
+                                    <h3 className="text-lg font-bold text-center mb-4" style={{ color: '#0c969c' }}>
+                                        Match Results
+                                    </h3>
+                                    
+                                    {/* Wins */}
+                                    <div className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className="flex items-center">
+                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3" style={{ backgroundColor: '#16a34a' }}>
+                                                <span className="text-white font-bold">W</span>
+                                            </div>
+                                            <span className="font-medium" style={{ color: '#6ba3be' }}>Wins</span>
+                                        </div>
+                                        <span className="text-xl font-bold" style={{ color: '#0c969c' }}>
+                                            {statistics.number_of_wins}
+                                        </span>
+                                    </div>
+
+                                    {/* Draws */}
+                                    <div className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className="flex items-center">
+                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3" style={{ backgroundColor: '#eab308' }}>
+                                                <span className="text-white font-bold">D</span>
+                                            </div>
+                                            <span className="font-medium" style={{ color: '#6ba3be' }}>Draws</span>
+                                        </div>
+                                        <span className="text-xl font-bold" style={{ color: '#0c969c' }}>
+                                            {statistics.number_of_draws}
+                                        </span>
+                                    </div>
+
+                                    {/* Losses */}
+                                    <div className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                        <div className="flex items-center">
+                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3" style={{ backgroundColor: '#dc2626' }}>
+                                                <span className="text-white font-bold">L</span>
+                                            </div>
+                                            <span className="font-medium" style={{ color: '#6ba3be' }}>Losses</span>
+                                        </div>
+                                        <span className="text-xl font-bold" style={{ color: '#0c969c' }}>
+                                            {statistics.number_of_losses}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Additional Stats */}
+                                <div className="mt-6 pt-6 border-t" style={{ borderColor: '#0a7075' }}>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="text-center p-3 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                            <div className="text-lg font-bold" style={{ color: '#0c969c' }}>
+                                                {statistics.win_points}
+                                            </div>
+                                            <div className="text-xs font-medium" style={{ color: '#6ba3be' }}>
+                                                Win Points
+                                            </div>
+                                        </div>
+                                        <div className="text-center p-3 rounded-xl" style={{ backgroundColor: '#031716' }}>
+                                            <div className="text-lg font-bold" style={{ color: '#0c969c' }}>
+                                                {statistics.lose_points}
+                                            </div>
+                                            <div className="text-xs font-medium" style={{ color: '#6ba3be' }}>
+                                                Lose Points
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="p-8 text-center">
+                                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                                     style={{ backgroundColor: '#0a7075' }}>
+                                    <span className="text-2xl" style={{ color: '#6ba3be' }}>📊</span>
+                                </div>
+                                <h3 className="text-lg font-semibold mb-2" style={{ color: '#0c969c' }}>
+                                    No Statistics Available
+                                </h3>
+                                <p style={{ color: '#6ba3be' }}>
+                                    Statistics will appear here once the team starts playing matches.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
