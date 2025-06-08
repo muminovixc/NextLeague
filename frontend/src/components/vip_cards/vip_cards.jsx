@@ -13,7 +13,7 @@ const createCheckoutSession = async (priceId) => {
     throw new Error("Failed to create checkout session");
   }
 
-  return await res.json(); // očekuješ { sessionId: "..." }
+  return await res.json(); 
 };
 
 export default function VipCard() {

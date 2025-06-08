@@ -19,6 +19,8 @@ from repositories.homepage import get_leagues_by_user
 from auth.jwt_utils import decode_access_token
 from services.homepage import fetch_user_leagues
 from services.homepage import fetch_user_teams
+from schemas.vip_schema import ConfirmPurchaseSchema
+from services.vip_service import handle_confirm_purchase
 import uvicorn
 import stripe
 from dotenv import load_dotenv
@@ -36,6 +38,7 @@ stripe.api_key = api_key
 @router.post("/create-checkout-session")
 async def create_checkout_session(request: Request):
     data = await request.json()
+    print(data)
 
     checkout_session = stripe.checkout.Session.create(
         success_url="http://localhost:3000/vip/success?session_id={CHECKOUT_SESSION_ID}",
@@ -60,10 +63,18 @@ async def verify_session(data: SessionVerifyRequest):
         session = stripe.checkout.Session.retrieve(data.sessionId)
 
         if session.payment_status == "paid":
-            # Možeš ovdje pronaći korisnika po e-mailu i označiti kao Premium
-            return {"valid": True, "customerEmail": session.customer_email}
+            return {"valid": True}
         else:
-            return {"valid": False, "message": "Plaćanje nije uspješno"}
+            return {"valid": False}
 
     except stripe.error.InvalidRequestError:
         raise HTTPException(status_code=400, detail="Nevažeći session ID")
+
+
+@router.post("/confirm-purchase")
+def confirm_purchase( request: Request,
+    data: ConfirmPurchaseSchema,
+    session: Session = Depends(get_session)):
+    
+    handle_confirm_purchase(request,session, data.sessionId)
+    return {"message": "User type updated successfully"}

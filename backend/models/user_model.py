@@ -13,3 +13,4 @@ class User(SQLModel, table=True):
     email: str
     password: str
     phone_number: str
+    user_type_id: Optional[int] = Field(default=1)

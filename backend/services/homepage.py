@@ -7,6 +7,8 @@ from schemas.homepage import LeagueRead
 from repositories.homepage import get_leagues_by_user
 from models.league_model import League
 from models.team_model import Team
+from sqlmodel.ext.asyncio.session import AsyncSession
+from repositories.homepage import search_all
 
 def get_logged_user(session: Session, user_id: int) -> UserResponse:
     user = user_repository.get_user_by_id(session, user_id)
@@ -27,3 +29,8 @@ def fetch_user_leagues(session: Session, user_id: int):
 
 def fetch_user_teams(session: Session, user_id: int):
     return session.query(Team).filter(Team.moderator_user_id == user_id).all()
+
+
+
+async def perform_search(session: AsyncSession, query: str):
+    return await search_all(session, query)

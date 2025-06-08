@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
+from typing import Literal
+from typing import List
 
 class UserResponse(BaseModel):
     id: int
@@ -40,4 +42,22 @@ class TeamRead(BaseModel):
     team_identification: str
 
     class Config:
-        from_attributes = True       
+        from_attributes = True 
+
+
+class PlayerSchema(BaseModel):
+    id: int
+    name: str
+
+class TeamSchema(BaseModel):
+    id: int
+    name: str
+
+class LeagueSchema(BaseModel):
+    id: int
+    name: str
+
+class SearchResult(BaseModel):
+    players: List[PlayerSchema]
+    teams: List[TeamSchema]
+    leagues: List[LeagueSchema]
