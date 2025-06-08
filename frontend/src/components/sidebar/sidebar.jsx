@@ -98,10 +98,19 @@ const Sidebar = ()=> {
         {/* Logout Button */}
         <div className="mt-10 pt-6 border-t border-teal-800">
           <button
-            onClick={() => {
-              localStorage.removeItem("user");
-              location.assign('/');
-            }}
+             onClick={async () => {
+    try {
+      await fetch('http://localhost:8000/logout', {
+        method: 'POST',
+        credentials: 'include', // šalje cookie
+      });
+
+      localStorage.removeItem("user_data");
+      location.assign('/');
+    } catch (err) {
+      console.error("Logout greška:", err);
+    }
+  }}
             className="flex items-center gap-3 text-red-400 hover:text-red-500 transition text-sm font-medium"
           >
             <LogOut size={18} /> Logout
