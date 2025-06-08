@@ -10,6 +10,7 @@ class UserResponse(BaseModel):
     birth_date: date
     email: str
     phone_number: str
+    user_type_id: int
 
     class Config:
         from_attributes = True
