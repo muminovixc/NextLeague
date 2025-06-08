@@ -52,3 +52,4 @@ def register_user(data: RegisterRequest, session: Session):
     auth_repository.create_user(session, new_user)
 
     return {"message": "User registered successfully"}
+

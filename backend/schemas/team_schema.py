@@ -17,7 +17,7 @@ class TeamRead(TeamBase):
     team_logo: Optional[str]
 
     class Config:
-        orm_mode = True  # ovo je ORM objekt, pročitaj njegove atribute kao da su polja u dictionaryju.
+        from_attributes = True  # ovo je ORM objekt, pročitaj njegove atribute kao da su polja u dictionaryju.
 
 class TeamUpdate(TeamBase):
     team_logo: Optional[str]
