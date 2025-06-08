@@ -1,21 +1,28 @@
 from repositories import team_repository as TeamRepository
 from schemas.team_schema import TeamCreate, TeamUpdate
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 from models import team_model
 from typing import List, Optional
 from auth.jwt_utils import decode_access_token
-
+import traceback
 def getMyTeams(db: Session, token: str):  
     try:
-        print(f"Received token: {token}")
         statement = decode_access_token(token)
         user_id = statement.get("id")
         if not user_id:
             raise Exception("User ID not found in token.")
-        print(f"Decoded user_id: {user_id}")
-        return TeamRepository.getMyTeams(db, user_id)
+
+        teams = TeamRepository.getMyTeams(db, user_id)
+        return {
+            "user_id": user_id,
+            "teams": teams
+        }
+
     except Exception as e:
         raise Exception(f"Token error: {str(e)}")
+
     
 def GetAllTeams(db: Session,token: str):
     try:
@@ -55,6 +62,70 @@ def getTeamById(db: Session, team_id: int):
 def getTeamStatistic(db: Session, team_id: int):
     return TeamRepository.getTeamStatistic(db, team_id)
 
+def deleteTeam(db: Session, team_id: int, token: str):
+    try:
+        decoded = decode_access_token(token)
+        if not decoded or "id" not in decoded:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+        user_id = decoded["id"]
+
+        print("Decoded user ID:", user_id)
+        print("Team ID to delete:", team_id)
+
+        result = TeamRepository.deleteTeam(db, team_id, user_id)
+        print("Deletion result:", result)
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Exception in deleteTeam:")
+        print(traceback.format_exc())  # Dodaj ovo
+        raise HTTPException(
+            status_code=500,
+            detail=f"Greška prilikom brisanja tima: {str(e)}"
+        )
 
 
+def createTeam(db: Session, team: TeamCreate, token: str):
+    try:
+        statement = decode_access_token(token)
+        user_id = statement.get("id")
+        if not user_id:
+            raise HTTPException(
+                status_code=401, 
+                detail="User ID not found in token."
+            )
 
+        team.moderator_user_id = user_id
+        return TeamRepository.createTeam(db, team, user_id)
+    
+    except HTTPException:
+        # Re-raise HTTPException as is
+        raise
+    
+    except Exception as e:
+        error_msg = str(e)
+        print(f"Error creating team: {error_msg}")
+        
+        # Provjeri da li je greška povezana sa maksimalnim brojem timova
+        if "maksimalan broj timova" in error_msg.lower():
+            raise HTTPException(
+                status_code=400, 
+                detail="Dostigli ste maksimalan broj timova koji možete kreirati."
+            )
+        
+        # Provjeri da li je SQLAlchemy/PostgreSQL greška
+        if "psycopg2.errors.RaiseException" in error_msg:
+            if "korisnik regular je dostigao maksimalan broj timova" in error_msg.lower():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Dostigli ste maksimalan broj timova koji možete kreirati."
+                )
+        
+        # Za sve ostale greške
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Greška prilikom kreiranja tima: {error_msg}"
+        )

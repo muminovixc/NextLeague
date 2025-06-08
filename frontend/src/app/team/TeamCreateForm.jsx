@@ -1,172 +1,342 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { createTeam } from '../../lib/team';
 
-export default function FootballFieldVisualization({ members = [] }) {
-  // Positions on the field
-  const positions = {
-    goalkeeper: { name: 'Goalkeeper', abbreviation: 'GK', defaultCount: 1 },
-    defender: { name: 'Defender', abbreviation: 'DEF', defaultCount: 4 },
-    midfielder: { name: 'Midfielder', abbreviation: 'MID', defaultCount: 4 },
-    forward: { name: 'Forward', abbreviation: 'FWD', defaultCount: 2 },
+export default function TeamCreateForm({ onClose, onTeamCreated }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    team_sport: '',
+    country: '',
+    team_logo: '',
+    team_identification: ''
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // Popular sports options
+  const sportsOptions = [
+    'Football', 'Basketball', 'Volleyball', 'Tennis', 'Handball',
+    'Swimming', 'Athletics', 'Cycling', 'Boxing', 'Wrestling'
+  ];
+
+  // Popular countries
+  const countryOptions = [
+    'Bosnia and Herzegovina', 'Croatia', 'Serbia', 'Montenegro',
+    'Slovenia', 'Germany', 'France', 'Italy', 'Spain', 'England',
+    'Netherlands', 'Belgium', 'Portugal', 'Brazil', 'Argentina'
+  ];
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
-  // State to track assigned positions
-  const [assignedPlayers, setAssignedPlayers] = useState({
-    goalkeeper: [],
-    defender: [],
-    midfielder: [],
-    forward: [],
-    unassigned: []
-  });
-
-  // Assign players to positions based on data or randomly
-  useEffect(() => {
-    if (!members || members.length === 0) return;
-
-    const newAssignedPlayers = {
-      goalkeeper: [],
-      defender: [],
-      midfielder: [],
-      forward: [],
-      unassigned: []
-    };
-
-    // First, use any existing position data
-    const assignedMemberIds = new Set();
-    members.forEach(member => {
-      const position = member.position?.toLowerCase();
-      if (position && positions[position]) {
-        newAssignedPlayers[position].push(member);
-        assignedMemberIds.add(member.id);
-      }
-    });
-
-    // Then randomly assign remaining members
-    const unassignedMembers = members.filter(member => !assignedMemberIds.has(member.id));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    // Assign goalkeeper first (only one)
-    if (newAssignedPlayers.goalkeeper.length === 0 && unassignedMembers.length > 0) {
-      newAssignedPlayers.goalkeeper.push(unassignedMembers.shift());
+    // Validation
+    if (!formData.name.trim()) {
+      setError('Team name is required');
+      return;
     }
     
-    // Distribute remaining players to positions
-    const remainingPositions = ['defender', 'midfielder', 'forward'];
+    if (!formData.team_sport.trim()) {
+      setError('Team sport is required');
+      return;
+    }
     
-    unassignedMembers.forEach(member => {
-      // Find position with fewest players relative to default count
-      const targetPosition = remainingPositions.reduce((bestPos, pos) => {
-        const currentRatio = newAssignedPlayers[pos].length / positions[pos].defaultCount;
-        const bestRatio = newAssignedPlayers[bestPos].length / positions[bestPos].defaultCount;
-        return currentRatio < bestRatio ? pos : bestPos;
-      }, remainingPositions[0]);
+    if (!formData.country.trim()) {
+      setError('Country is required');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const teamData = {
+        name: formData.name.trim(),
+        team_sport: formData.team_sport.trim(),
+        country: formData.country.trim(),
+        team_logo: formData.team_logo.trim() || null,
+        team_identification: formData.team_identification.trim() || null
+      };
+
+      const newTeam = await createTeam(teamData);
+      setSuccess(true);
       
-      newAssignedPlayers[targetPosition].push(member);
-    });
-    
-    setAssignedPlayers(newAssignedPlayers);
-  }, [members]);
+      // Call parent callback to refresh teams list
+      if (onTeamCreated) {
+        onTeamCreated(newTeam);
+      }
+      
+      // Close form after success
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+      
+    } catch (err) {
+      console.error('Error creating team:', err);
+      setError(err.message || 'Failed to create team. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div 
-        className="relative w-full rounded-lg overflow-hidden aspect-[1.5/1]"
-        style={{ 
-          backgroundColor: '#256e33', 
-          backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)',
-          backgroundSize: '25px 25px'
-        }}
-      >
-        {/* Field markings */}
-        <div className="absolute inset-0 border-2 border-white border-opacity-30 m-4 rounded-lg"></div>
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white bg-opacity-30"></div>
-        <div className="absolute left-0 right-0 top-1/2 h-px bg-white bg-opacity-30"></div>
-        <div className="absolute left-1/2 top-1/2 w-16 h-16 rounded-full border-2 border-white border-opacity-30 transform -translate-x-1/2 -translate-y-1/2"></div>
-        
-        {/* Penalty areas */}
-        <div className="absolute left-0 top-1/2 w-1/5 h-2/5 border-r-2 border-t-2 border-b-2 border-white border-opacity-30 transform -translate-y-1/2"></div>
-        <div className="absolute right-0 top-1/2 w-1/5 h-2/5 border-l-2 border-t-2 border-b-2 border-white border-opacity-30 transform -translate-y-1/2"></div>
-        
-        {/* Goal areas */}
-        <div className="absolute left-0 top-1/2 w-1/12 h-1/4 border-r-2 border-t-2 border-b-2 border-white border-opacity-30 transform -translate-y-1/2"></div>
-        <div className="absolute right-0 top-1/2 w-1/12 h-1/4 border-r-0 border-l-2 border-t-2 border-b-2 border-white border-opacity-30 transform -translate-y-1/2"></div>
-        
-        {/* Center circle */}
-        <div className="absolute left-1/2 top-1/2 w-32 h-32 rounded-full border-2 border-white border-opacity-30 transform -translate-x-1/2 -translate-y-1/2"></div>
+  const handleCancel = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
 
-        {/* Players section */}
-        {/* Goalkeeper */}
-        <div className="absolute left-[5%] top-1/2 transform -translate-y-1/2 flex flex-col items-center">
-          {assignedPlayers.goalkeeper.slice(0, 1).map((player, index) => (
-            <div key={player.id} className="my-1 flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
-                {player.name?.charAt(0) || '?'}
-              </div>
-              <div className="mt-1 text-xs font-semibold text-white bg-black bg-opacity-50 px-2 py-1 rounded-full whitespace-nowrap">
-                {player.name?.split(' ')[0] || 'GK'}
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Defenders */}
-        <div className="absolute left-[25%] top-0 bottom-0 w-[10%] flex flex-col justify-evenly items-center">
-          {assignedPlayers.defender.slice(0, 4).map((player, index) => (
-            <div key={player.id} className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
-                {player.name?.charAt(0) || '?'}
-              </div>
-              <div className="mt-1 text-xs font-semibold text-white bg-black bg-opacity-50 px-2 py-1 rounded-full whitespace-nowrap">
-                {player.name?.split(' ')[0] || 'DEF'}
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Midfielders */}
-        <div className="absolute left-[50%] top-0 bottom-0 w-[10%] flex flex-col justify-evenly items-center transform -translate-x-1/2">
-          {assignedPlayers.midfielder.slice(0, 4).map((player, index) => (
-            <div key={player.id} className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
-                {player.name?.charAt(0) || '?'}
-              </div>
-              <div className="mt-1 text-xs font-semibold text-white bg-black bg-opacity-50 px-2 py-1 rounded-full whitespace-nowrap">
-                {player.name?.split(' ')[0] || 'MID'}
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Forwards */}
-        <div className="absolute left-[75%] top-0 bottom-0 w-[10%] flex flex-col justify-evenly items-center">
-          {assignedPlayers.forward.slice(0, 2).map((player, index) => (
-            <div key={player.id} className="flex flex-col items-center" style={{ marginTop: index === 0 ? '20%' : '60%' }}>
-              <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
-                {player.name?.charAt(0) || '?'}
-              </div>
-              <div className="mt-1 text-xs font-semibold text-white bg-black bg-opacity-50 px-2 py-1 rounded-full whitespace-nowrap">
-                {player.name?.split(' ')[0] || 'FWD'}
-              </div>
-            </div>
-          ))}
+  if (success) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60 backdrop-blur-sm">
+        <div 
+          className="rounded-2xl shadow-2xl max-w-md w-full mx-4 border-2 p-8 text-center"
+          style={{ backgroundColor: '#031716', borderColor: '#0c969c' }}
+        >
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+               style={{ backgroundColor: '#0c969c' }}>
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold mb-4" style={{ color: '#0c969c' }}>
+            Team Created Successfully!
+          </h3>
+          <p className="text-lg" style={{ color: '#6ba3be' }}>
+            Your team has been created and added to your teams list.
+          </p>
         </div>
       </div>
-      
-      {/* Legend */}
-      <div className="flex justify-center mt-4 space-x-4">
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full bg-yellow-400 mr-1"></div>
-          <span className="text-xs" style={{ color: '#6ba3be' }}>GK</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full bg-blue-500 mr-1"></div>
-          <span className="text-xs" style={{ color: '#6ba3be' }}>DEF</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full bg-green-500 mr-1"></div>
-          <span className="text-xs" style={{ color: '#6ba3be' }}>MID</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-full bg-red-500 mr-1"></div>
-          <span className="text-xs" style={{ color: '#6ba3be' }}>FWD</span>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60 backdrop-blur-sm">
+      <div 
+        className="rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto border-2"
+        style={{ backgroundColor: '#031716', borderColor: '#0c969c' }}
+      >
+        <div className="p-8">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#0c969c' }}>
+                Create New Team
+              </h2>
+              <p className="text-lg" style={{ color: '#6ba3be' }}>
+                Fill in the details below to create your team
+              </p>
+            </div>
+            <button 
+              onClick={handleCancel}
+              className="text-2xl font-bold p-2 rounded-xl w-12 h-12 flex items-center justify-center transition-all hover:scale-110"
+              style={{ backgroundColor: '#032f30', color: '#6ba3be' }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 p-4 rounded-xl border-l-4" 
+                 style={{ 
+                   backgroundColor: '#4a1a1a', 
+                   color: '#ff6b6b',
+                   borderLeftColor: '#ff4757'
+                 }}>
+              <p className="font-medium">{error}</p>
+            </div>
+          )}
+
+          {/* Form */}
+          <div className="space-y-6">
+            {/* Team Name */}
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#0c969c' }}>
+                Team Name *
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter team name"
+                className="w-full p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                style={{ 
+                  backgroundColor: '#032f30', 
+                  borderColor: '#0a7075',
+                  color: '#6ba3be'
+                }}
+                required
+              />
+            </div>
+
+            {/* Sport Selection */}
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#0c969c' }}>
+                Sport *
+              </label>
+              <select
+                name="team_sport"
+                value={formData.team_sport}
+                onChange={handleInputChange}
+                className="w-full p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                style={{ 
+                  backgroundColor: '#032f30', 
+                  borderColor: '#0a7075',
+                  color: '#6ba3be'
+                }}
+                required
+              >
+                <option value="">Select a sport</option>
+                {sportsOptions.map((sport) => (
+                  <option key={sport} value={sport} style={{ backgroundColor: '#032f30' }}>
+                    {sport}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Country Selection */}
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#0c969c' }}>
+                Country *
+              </label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="w-full p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                style={{ 
+                  backgroundColor: '#032f30', 
+                  borderColor: '#0a7075',
+                  color: '#6ba3be'
+                }}
+                required
+              >
+                <option value="">Select a country</option>
+                {countryOptions.map((country) => (
+                  <option key={country} value={country} style={{ backgroundColor: '#032f30' }}>
+                    {country}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Team Logo URL */}
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#0c969c' }}>
+                Team Logo URL
+                <span className="text-sm font-normal ml-2" style={{ color: '#6ba3be' }}>
+                  (optional)
+                </span>
+              </label>
+              <input
+                type="url"
+                name="team_logo"
+                value={formData.team_logo}
+                onChange={handleInputChange}
+                placeholder="https://example.com/logo.png"
+                className="w-full p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                style={{ 
+                  backgroundColor: '#032f30', 
+                  borderColor: '#0a7075',
+                  color: '#6ba3be'
+                }}
+              />
+            </div>
+
+            {/* Team Identification */}
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#0c969c' }}>
+                Team Identification Code
+                <span className="text-sm font-normal ml-2" style={{ color: '#6ba3be' }}>
+                  (optional)
+                </span>
+              </label>
+              <input
+                type="text"
+                name="team_identification"
+                value={formData.team_identification}
+                onChange={handleInputChange}
+                placeholder="e.g., FCB, MUN, etc."
+                className="w-full p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                style={{ 
+                  backgroundColor: '#032f30', 
+                  borderColor: '#0a7075',
+                  color: '#6ba3be'
+                }}
+              />
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex gap-4 pt-6">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="flex-1 py-4 rounded-xl font-semibold transition-all duration-200 hover:transform hover:scale-105 border-2"
+                style={{ 
+                  backgroundColor: 'transparent', 
+                  borderColor: '#0a7075',
+                  color: '#6ba3be'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex-1 py-4 rounded-xl font-semibold transition-all duration-200 hover:transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ 
+                  backgroundColor: '#0c969c', 
+                  color: '#031716'
+                }}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-b-transparent mr-2" 
+                         style={{ borderColor: '#031716' }}></div>
+                    Creating...
+                  </div>
+                ) : (
+                  'Create Team'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Info Box */}
+          <div className="mt-8 p-4 rounded-xl border" 
+               style={{ backgroundColor: '#032f30', borderColor: '#0a7075' }}>
+            <div className="flex items-start">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5"
+                   style={{ backgroundColor: '#0c969c' }}>
+                <span className="text-xs font-bold text-white">i</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium mb-2" style={{ color: '#0c969c' }}>
+                  Team Creation Guidelines
+                </p>
+                <div className="text-sm space-y-1" style={{ color: '#6ba3be' }}>
+                  <div>• Team name should be unique and descriptive</div>
+                  <div>• You will be set as the team moderator</div>
+                  <div>• You can add members after creating the team</div>
+                  <div>• Logo URL should be a direct link to an image</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
