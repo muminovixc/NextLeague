@@ -65,3 +65,8 @@ class TeamMemberSchema(BaseModel):
     class Config:
         from_attributes = True
 
+class DeleteTeam(BaseModel):
+    team_id: int
+
+    class Config:
+        from_attributes = True

@@ -94,14 +94,13 @@ export default function TeamView() {
         );
     }
 
-    // Destructure team and statistics data safely
-    const team = teamData[0]; // Team object
-    const statistics = teamData[1] || null; // TeamStatistic object (might be null)
+    
+    const team = teamData[0]; 
+    const statistics = teamData[1] || null; 
+    const league = teamData[2] || null;
 
-    // Calculate win percentage safely
     const winPercentage = statistics?.number_of_matches_played > 0 
-        ? ((statistics.number_of_wins / statistics.number_of_matches_played) * 100).toFixed(1)
-        : 0;
+        ? ((statistics.number_of_wins / statistics.number_of_matches_played) * 100).toFixed(1): 0;
 
     // Additional safety check for team object
     if (!team || typeof team !== 'object') {
@@ -143,6 +142,24 @@ export default function TeamView() {
                         Back
                     </button>
                 </div>
+
+                    {                    /* Team and League Information */}
+                {league && (
+                        <div className="mt-6 text-center bg-[#032f30] p-2 rounded-2xl shadow-lg mb-8">
+                            <p className="text-lg text-[#6ba3be]">
+                            Participating in:
+                            <button
+                                onClick={() => router.push(`/league/view/${league.league_id}`)}
+                                className="ml-2 px-4 py-2 rounded-lg transition-all hover:transform hover:scale-105"
+                                style={{textDecoration: 'underline',color: '#0c969c'
+                                , fontWeight: 'bold' }}
+                            >
+                                {league.name}
+                            </button>
+                            </p>
+                        </div>
+)}
+
 
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

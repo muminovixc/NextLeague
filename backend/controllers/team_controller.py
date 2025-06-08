@@ -71,3 +71,12 @@ def createTeam(team: Team, request: Request, session: Session = Depends(get_db))
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     return team_service.createTeam(session, team, token)
+
+@router.delete("/deleteMyTeam/{team_id}")
+def deleteTeam(team_id: int, request: Request, session: Session = Depends(get_db)):
+    token = request.cookies.get('access_token')
+
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    return team_service.deleteTeam(session, team_id, token)

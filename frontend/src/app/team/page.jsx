@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import FootballFieldVisualization from './FootballFieldVisualization';
 import TeamCreateForm from './TeamCreateForm';
-import { getMyTeam , getTeamMembers, getAllTeams} from '../../lib/team';
+import { getMyTeam , getTeamMembers, getAllTeams,deleteTeam} from '../../lib/team';
+import Search from './Search'; 
 
 export default function TeamPage() {
   const router = useRouter();
@@ -17,13 +18,20 @@ export default function TeamPage() {
   const [showMembers, setShowMembers] = useState(false);
   const [showAllTeams, setShowAllTeams] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+const [filteredTeams, setFilteredTeams] = useState([]);
 
   useEffect(() => {
     async function fetchTeams() {
       try {
         setLoading(true);
-        const teams = await getMyTeam();
-        setMyTeams(teams);
+        const response = await getMyTeam();
+
+        setMyTeams(response.teams);
+        setCurrentUser(response.user_id);
+
         setError(null);
       } catch (error) {
         console.error('Error fetching teams:', error);
@@ -70,6 +78,18 @@ export default function TeamPage() {
     router.push(`/team/view/${teamId}`);
   };
 
+  // za brisanje timova mojih
+  const handleDeleteTeam = async (teamId) => {
+  try {
+    await deleteTeam(teamId);
+    const updatedTeams = myTeams.filter(team => team.team_id !== teamId);
+    setMyTeams(updatedTeams);
+  } catch (error) {
+    console.error("Failed to delete team:", error);
+    setError("Greška prilikom brisanja tima.");
+  }
+};
+
 
   const closeMembers = () => {
     setShowMembers(false);
@@ -88,11 +108,18 @@ export default function TeamPage() {
     setShowCreateForm(false);
   };
 
+  const handleSearch = (query) => {
+  setSearchQuery(query);
+  const filtered = allTeams.filter(team =>
+    team.name.toLowerCase().includes(query.toLowerCase())
+  );
+  setFilteredTeams(filtered);
+};
+
   const handleTeamCreated = async (newTeam) => {
-    // Refresh the teams list after creating a new team
     try {
-      const teams = await getMyTeam();
-      setMyTeams(teams);
+      const response = await getMyTeam();
+      setMyTeams(response.teams);
       setShowCreateForm(false);
     } catch (error) {
       console.error('Error refreshing teams:', error);
@@ -243,6 +270,16 @@ export default function TeamPage() {
                     >
                       View Statistic
                     </button>
+                   {team.moderator_user_id === currentUser && (
+                          <button
+                            onClick={() => handleDeleteTeam(team.team_id)}
+                            className="w-full py-3 rounded-xl font-semibold transition-all duration-200 ease-in-out transform hover:translate-y-1 hover:shadow-lg"
+                            style={{ backgroundColor: '#FF5C5C', color: '#031716' }}
+                          >
+                            Delete Team
+                          </button>
+                        )}
+
                     </div>
                   </div>
                 </div>
@@ -250,6 +287,8 @@ export default function TeamPage() {
             </div>
           )}
         </div>
+
+          <Search onSearch={handleSearch} />
 
         {/* All Teams Section */}
         <div className="mb-16">
@@ -291,7 +330,7 @@ export default function TeamPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {allTeams.map((team) => (
+               {(searchQuery ? filteredTeams : allTeams).map((team) => (
                   <div 
                     key={team.team_id || team.id} 
                     className="group rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl border"
@@ -330,6 +369,7 @@ export default function TeamPage() {
                       </div>
                       
                       {/* Action Button */}
+                      <div className='flex flex-col gap-y-3'>
                       <button
                         onClick={() => handleViewTeam(team.team_id || team.id)}
                         className="w-full py-2 rounded-lg font-medium transition-all duration-200 hover:transform hover:translate-y-0.5"
@@ -340,7 +380,18 @@ export default function TeamPage() {
                       >
                         View Team
                       </button>
+
+                       <button    //                      
+                        className="w-full py-3 rounded-lg font-medium transition-all duration-200 hover:transform hover:translate-y-0.5"
+                        style={{ 
+                          backgroundColor: '#0a7075', 
+                          color: '#6ba3be',
+                        }}
+                      >
+                       Send a join request
+                      </button>
                     </div>
+                  </div>
                   </div>
                 ))}
               </div>

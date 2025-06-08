@@ -46,7 +46,7 @@ export async function createTeam(teamData) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(teamData),
-      credentials: 'include', // Include cookies in the request
+      credentials: 'include',
     });
 
     if (!res.ok) {
@@ -70,24 +70,32 @@ export async function createTeam(teamData) {
 }
 
 export async function getMyTeam() {
-  try{
+  try {
     const res = await fetch(`${API_URL}/team/getMyTeams`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include', // Include cookies in the request
-  });
-  if (!res.ok) {
-    throw new Error('Failed to fetch teams');
-  }
-  const data = await res.json();
-  console.log('Fetched teams:', data);
-  return data;
-} catch (error) {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch teams');
+    }
+
+    const data = await res.json();
+
+    // Validacija
+    if (!data.teams || !Array.isArray(data.teams)) {
+      return { teams: [], user_id: null }; // fallback
+    }
+
+    return data;
+  } catch (error) {
     throw error;
   }
 }
+
 
 export async function getTeamMembers(teamId) {
   try{
@@ -107,3 +115,21 @@ export async function getTeamMembers(teamId) {
   }
 }
 
+export async function deleteTeam(teamId) {
+return fetch(`${API_URL}/team/deleteMyTeam/${teamId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include', // Include cookies in the request
+  })
+  .then(res => {
+    if (!res.ok) {
+      throw new Error('Failed to delete team');
+    }
+    return res.json();
+  })
+  .catch(error => {
+    throw error;
+  });
+}
