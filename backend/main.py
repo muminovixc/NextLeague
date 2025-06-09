@@ -1,11 +1,9 @@
-
-from fastapi import FastAPI, Depends
-from sqlmodel import Session, select
-from database.database import engine
-from models.user_model import User
-from controllers.auth_controller import router as auth_router
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from controllers.user_controller import router as user_router
 from controllers.league_controller import router as league_router
 from controllers.team_controller import router as team_router
+from controllers.auth_controller import router as auth_router
 from controllers.homepage import router as homepage_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
@@ -16,17 +14,20 @@ from controllers.vip_controller import router as vip_router
 
 app = FastAPI()
 
-# Dodavanje CORS middleware-a
+
+
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # samo za frontend koji je na ovom portu
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # dozvoljava sve HTTP metode, uključujući OPTIONS
-    allow_headers=["*"],  # dozvoljava sva zaglavlja
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 print("FastAPI app se pokrenula")
 
- 
+# Include routers
+
 app.include_router(auth_router)
 app.include_router(league_router)  
 app.include_router(team_router)  
