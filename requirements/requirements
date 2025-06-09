@@ -3,7 +3,7 @@ pip install sqlmodel
 pip install psycopg2
 pip install pydantic[email]
 npm install lucide-react
-#.\venv\Scripts\activate
-# pip install python-jose[cryptography]
+pip install stripe
+npm install @mui/material @emotion/react @emotion/styled
+npm install @heroicons/react  // za ikone
 # za pokretanje je :  uvicorn backend.main:app --reload
-#za pokretanje frontenda npm run dev( prijasnje se mora instalirati npm install)

@@ -51,3 +51,15 @@ def get_user_data(request: Request):
         return {"user_data": payload}
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+
+@router.post("/logout")
+def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/"
+    )
+    return {"message": "Logged out"}

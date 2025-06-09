@@ -1,4 +1,5 @@
 from sqlmodel import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 # Ispravan connection string (bez ?ssl=require)
@@ -10,3 +11,11 @@ engine = create_engine(
     echo=True,
     connect_args={"sslmode": "require"}
 )
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def get_session():
+    # Kreiraj novu sesiju
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
