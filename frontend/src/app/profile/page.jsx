@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { get_my_profile } from "../../lib/user";
 import UserNavbar from "../../components/user_navbar/user_navbar";
+
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -96,11 +97,11 @@ export default function ProfilePage() {
   if (!user) return <div>No profile data</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-12">
-      <div className="bg-[#032f30] rounded-lg p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <div className="bg-[#031716] p-6 rounded-lg border border-[#0c969c]/20">
+    <div className="min-h-screen flex items-center justify-center bg-[#031716]">
+      <div className="bg-[#032f30] rounded-lg p-8 max-w-6xl w-full min-h-[750px] h-full flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
+          <div className="flex-1 flex flex-col">
+            <div className="bg-[#031716] p-6 rounded-lg border border-[#0c969c]/20 h-full flex flex-col">
               <div className="w-32 h-32 bg-[#0a7075] rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg
                   className="w-16 h-16 text-white"
@@ -222,7 +223,7 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          <div>
+          <div className="flex-1 flex flex-col">
             <UserNavbar/>
           </div>
         </div>

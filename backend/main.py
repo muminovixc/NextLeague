@@ -21,5 +21,5 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_router)
 app.include_router(user_router)
-app.include_router(league_router, prefix="/league", tags=["leagues"])
-app.include_router(team_router, prefix="/team", tags=["teams"])
+app.include_router(league_router)
+app.include_router(team_router)

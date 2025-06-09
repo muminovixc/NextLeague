@@ -1,8 +1,12 @@
 "use client";
 import React, { useState } from "react";
+import SportSelector from "../userteams/SportSelector";
+import UserTeams from "../userteams/UserTeams";
+import UserLeagues from "../userleagues/UserLeagues";
 
 export default function UserNavbar() {
   const [activeMenu, setActiveMenu] = useState(null);
+  const [selectedSport, setSelectedSport] = useState("Football");
 
   const topMenu = [
     { id: "moje_lige", label: "My leagues" },
@@ -11,50 +15,40 @@ export default function UserNavbar() {
     { id: "obavijesti", label: "Notifications" },
   ];
 
-  const sportsSubMenu = [
-    { id: "fudbal", label: "Fudbal" },
-    { id: "kosarka", label: "Košarka" },
-    { id: "rukomet", label: "Rukomet" },
-    { id: "odbojka", label: "Odbojka" },
-    { id: "gaming", label: "Gaming" },
-  ];
-
-  // Koje opcije treba da prikažu sekundarni navbar
-  const showSportsSubMenuFor = ["svi_mecevi", "statistika", "moje_lige", "moji_timovi"];
-
   return (
-    <nav>
-  <ul className="flex space-x-6 bg-gray-800 text-white p-4 w-full">
-    {topMenu.map((item) => (
-      <li
-        key={item.id}
-        className={`cursor-pointer px-3 py-2 rounded whitespace-nowrap ${
-          activeMenu === item.id ? "bg-gray-700" : "hover:bg-gray-600"
-        }`}
-        onClick={() =>
-          setActiveMenu(activeMenu === item.id ? null : item.id)
-        }
-      >
-        {item.label}
-      </li>
-    ))}
-  </ul>
+    <div>
+      <nav>
+        <ul className="flex space-x-6 bg-[#032f30] text-white p-4 w-full rounded-xl">
+          {topMenu.map((item) => (
+            <li
+              key={item.id}
+              className={`cursor-pointer px-3 py-2 rounded-xl whitespace-nowrap transition-all duration-200 ${
+                activeMenu === item.id 
+                  ? "bg-[#0c969c] text-[#031716]" 
+                  : "hover:bg-[#0a7075] hover:text-[#031716]"
+              }`}
+              onClick={() => setActiveMenu(activeMenu === item.id ? null : item.id)}
+            >
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      </nav>
+      {/* Prikaz sportova i timova kada je aktivan 'My teams' */}
+      {activeMenu === "moji_timovi" && (
+        <div className="mt-6">
+          <SportSelector selectedSport={selectedSport} onSportSelect={setSelectedSport} />
+          <UserTeams selectedSport={selectedSport} />
+        </div>
+      )}
 
-  {/* Sekundarni navbar */}
-  {activeMenu && showSportsSubMenuFor.includes(activeMenu) && (
-    <ul className="flex space-x-4 bg-gray-700 text-white p-3">
-      {sportsSubMenu.map((sport) => (
-        <li
-          key={sport.id}
-          className="cursor-pointer px-2 py-1 rounded whitespace-nowrap hover:bg-gray-600"
-        >
-          {sport.label}
-        </li>
-      ))}
-    </ul>
-  )}
-</nav>
-
+      {activeMenu === "moje_lige" && (
+        <div className="mt-6">
+          <SportSelector selectedSport={selectedSport} onSportSelect={setSelectedSport} />
+          <UserLeagues selectedSport={selectedSport} />
+        </div>
+      )}
+    </div>
   );
 }
 

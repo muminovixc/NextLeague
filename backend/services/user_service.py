@@ -14,7 +14,6 @@ def get_my_profile(db: Session, token: str):
     except Exception as e:
         raise Exception(f"Token error: {str(e)}")
 
-
 def update_my_profile(db: Session, payload: UserUpdate, token: str):
     try:
         jwt_payload = decode_access_token(token)

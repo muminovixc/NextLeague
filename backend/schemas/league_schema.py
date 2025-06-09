@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Literal
 
 class TeamStatisticOut(BaseModel):
     team_id: int
@@ -17,3 +17,11 @@ class TeamStatisticOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class LeagueCreate(BaseModel):
+    name: str
+    sport: Literal["Football", "Basketball", "Volleyball", "Handball", "Gaming"]
+    number_of_teams: int
+    number_of_players_in_team: int
+    country: str
+    access: Literal["PUBLIC", "PRIVATE"]

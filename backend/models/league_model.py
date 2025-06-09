@@ -8,7 +8,7 @@ class League(SQLModel, table=True):
     __tablename__ = "league"
 
     league_id: Optional[int] = Field(default=None, primary_key=True)
-    moderator_user_id : int =Field(foreign_key="user.id") 
+    moderator_user_id : int =Field(foreign_key="users.id") 
     name: str = Field(max_length=100)
     sport: str = Field(max_length=100)
     number_of_teams: int

@@ -15,7 +15,7 @@ export default function HomePage() {
       if (parts.length === 2) return parts.pop().split(';').shift();
     };
 
-    const userCookie = getCookie('user_data');
+    const userCookie = getCookie('access_token');
     setUser(userCookie);
 
     console.log(userCookie)

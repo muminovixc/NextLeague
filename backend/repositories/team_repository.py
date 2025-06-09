@@ -1,42 +1,89 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
+from sqlalchemy import or_
 from models.team_model import Team
-from schemas.team_schema import TeamCreate, TeamUpdate
+from models.team_model import TeamStatistic
+from models.user_model import User
+from models.league_model import League
+from models.team_members_models import TeamMembers
+
 from typing import List, Optional
+# ovde uradi isti upit samo da je moderator_user_id == user_id
 
-class TeamRepository:
+def getMyTeams(db: Session, user_id: int):
+    
+    statement = (
+        select(Team)
+        .join(TeamMembers, TeamMembers.team_id == Team.team_id, isouter=True)
+        .where(
+            or_(
+                Team.moderator_user_id == user_id,
+                TeamMembers.user_id == user_id
+            )
+        )
+        .distinct()
+    )    
+    results = db.exec(statement)
+    return results.all()
 
-    @staticmethod
-    def create_team(db: Session, team: TeamCreate) -> Team:        
-        db_team = Team(**team.dict())
-        db.add(db_team)
+
+def createTeam(db: Session, team: Team, user_id: int):
+    try:
+        db.add(team)
         db.commit()
-        db.refresh(db_team)
-        return db_team
+        db.refresh(team)
+        return team
+    except Exception as e:
+        db.rollback() 
+        raise e
 
-    @staticmethod
-    def get_team_by_id(db: Session, team_id: int) -> Optional[Team]:
-        return db.query(Team).filter(Team.team_id == team_id).first()
 
-    @staticmethod
-    def get_teams(db: Session, skip: int = 0, limit: int = 100) -> List[Team]:
-        return db.query(Team).offset(skip).limit(limit).all()
+def GetAllTeams(db: Session):
+    statement = select(Team)
+    results = db.exec(statement)
+    return results.all()
 
-    @staticmethod
-    def update_team(db: Session, team_id: int, team_update: TeamUpdate) -> Optional[Team]:
-        db_team = db.query(Team).filter(Team.team_id == team_id).first()
-        if db_team:
-            for key, value in team_update.dict(exclude_unset=True).items():
-                setattr(db_team, key, value)
-            db.commit()
-            db.refresh(db_team)
-            return db_team
+def getTeamById(db: Session, team_id: int):
+    statement = (
+        select(Team, TeamStatistic,League)
+        .join(TeamStatistic, Team.team_id == TeamStatistic.team_id)
+        .join(League, TeamStatistic.league_id == League.league_id)
+        .where(Team.team_id == team_id)
+    )
+    result = db.exec(statement).first()
+    
+    if not result:
         return None
+    
+    team, team_statistic,league = result
+    
+    return [
+        team.dict() if team else None,
+        team_statistic.dict() if team_statistic else None,
+        league.dict() if league else None
+    ]
+#def getTeamStatistic(db: Session, team_id: int):
+  #  statement = select(Team).where(Team.team_id == team_id)
+  #  results = db.exec(statement)
+  #  return results.first()
 
-    @staticmethod
-    def delete_team(db: Session, team_id: int) -> bool:
-        db_team = db.query(Team).filter(Team.team_id == team_id).first()
-        if db_team:
-            db.delete(db_team)
-            db.commit()
-            return True
-        return False
+def getTeamMembers(db: Session, team_id: int):
+    statement = (
+        select(User.id, User.name, User.surname)
+        .join(TeamMembers, User.id == TeamMembers.user_id)
+        .where(TeamMembers.team_id == team_id)
+    )
+    results = db.exec(statement)
+    return results.all()
+
+def deleteTeam(db: Session, team_id: int,user_id: int):
+    statement = select(Team).where(
+    (Team.team_id == team_id) & (Team.moderator_user_id == user_id)
+)
+    team = db.exec(statement).first()
+    
+    if not team:
+        return None
+    
+    db.delete(team)
+    db.commit()
+    return team 

@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
 
   if (protectedRoutes.includes(request.nextUrl.pathname)) {
     const cookie = request.cookies.get('access_token')
-    console.log("NULLLL JE")
     console.log(cookie)
     if (!cookie) {
       return NextResponse.redirect(new URL('/login', request.url))
@@ -15,7 +14,6 @@ export function middleware(request: NextRequest) {
 
   return NextResponse.next()
 }
-
 export const config = {
   matcher: ['/profile','/league','/team','/homepage','/vip'], // Možeš staviti i '/(.*)' za sve rute
 }
