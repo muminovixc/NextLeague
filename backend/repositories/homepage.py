@@ -4,6 +4,7 @@ from models.league_model import League
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from models.team_model import Team
+from schemas.homepage import PlayerSchema, TeamSchema, LeagueSchema
 
 def get_user_by_id(session: Session, user_id: int) -> User | None:
     return session.query(User).filter(User.id == user_id).first()

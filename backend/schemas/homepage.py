@@ -50,6 +50,7 @@ class TeamRead(BaseModel):
 class PlayerSchema(BaseModel):
     id: int
     name: str
+    surname: str
 
 class TeamSchema(BaseModel):
     id: int

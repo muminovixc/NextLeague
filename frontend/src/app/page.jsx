@@ -167,9 +167,6 @@ export default function Home() {
 
 
         {/* CTA Section */}
-        import Link from 'next/link';
-
-import Link from 'next/link';
 
 <section className="w-full bg-[#274d60] py-24">
   <div className="max-w-7xl mx-auto px-6 text-center space-y-6">
