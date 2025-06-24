@@ -7,6 +7,7 @@ import CardsGrid from '../../components/homepage_components/homepage_card_grid';
 import LeagueGrid from '../../components/homepage_components/leagueCard_grid';
 import SearchBar from '../../components/homepage_components/searchbar';
 import TeamsGrid from '../../components/homepage_components/team_card_grid';
+import Link from 'next/link';
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
@@ -74,7 +75,7 @@ export default function HomePage() {
           <div className="w-full md:w-1/2 p-4 bg-[#0a7075] rounded">
             <div className="flex justify-between items-center mt-5 px-5">
               <p className="text-3xl font-semibold text-white">Your leagues</p>
-              <a href="/league" className="text-blue-400 hover:underline">view all leagues</a>
+              <Link href="/league" className="text-blue-400 hover:underline">view all leagues</Link>
             </div>
             <div className="flex flex-col md:flex-row w-auto">
               {<LeagueGrid /> || "No leagues found"}
@@ -85,7 +86,7 @@ export default function HomePage() {
           <div className="w-full md:w-1/2 p-4 bg-[#0a7075] rounded lg:ml-4 mt-4 md:mt-0">
             <div className="flex justify-between items-center mt-5 px-5 pb-5">
               <p className="text-3xl font-semibold text-white">Your teams</p>
-              <a href="/team" className="text-blue-400 hover:underline">view all teams</a>
+              <Link href="/team" className="text-blue-400 hover:underline">view all teams</Link>
             </div>
             <TeamsGrid />
           </div>

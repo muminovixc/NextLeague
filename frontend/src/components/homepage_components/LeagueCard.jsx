@@ -1,5 +1,5 @@
 import { UserIcon, LockClosedIcon, GlobeAltIcon, UsersIcon } from '@heroicons/react/24/solid';
-
+import Link from 'next/link';
 const LeagueCard = ({ sport, leagueName, role, teamCount, isPublic, href }) => {
   const sportColor =
     sport === 'Fudbal'
@@ -15,9 +15,9 @@ const LeagueCard = ({ sport, leagueName, role, teamCount, isPublic, href }) => {
         {sport}
       </span>
 
-      <a href={href}>
+      <Link href={href}>
         <h2 className="mt-3 text-lg font-semibold">{leagueName}</h2>
-      </a>
+      </Link>
 
       <div className="flex items-center mt-2 text-sm text-cyan-300 font-medium">
         <UserIcon className="h-4 w-4 mr-1" />
