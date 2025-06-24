@@ -129,3 +129,15 @@ def createTeam(db: Session, team: TeamCreate, token: str):
             status_code=500, 
             detail=f"Greška prilikom kreiranja tima: {error_msg}"
         )
+    
+def getMyTeamsModeratorFiltered(db: Session, token: str, league_sport: str):
+    try:
+        decoded = decode_access_token(token)
+        user_id = decoded.get("id")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+        return TeamRepository.getTeamsByModeratorAndSport(db, user_id, league_sport)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Greška: {str(e)}")

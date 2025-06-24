@@ -1,6 +1,15 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@heroicons/react": "^2.2.0",
+    "@mui/material": "^7.1.1",
+    "@stripe/stripe-js": "^7.3.0",
+    "stripe": "^18.2.1"
+=======
     "lucide-react": "^0.510.0",
     "@stripe/stripe-js": "^7.3.0"
+>>>>>>> 086b705d5d03e6330c64cf40a1922d8d78577b68
   }
 }

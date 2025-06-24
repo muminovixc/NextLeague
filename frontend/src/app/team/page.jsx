@@ -78,7 +78,6 @@ const [filteredTeams, setFilteredTeams] = useState([]);
     router.push(`/team/view/${teamId}`);
   };
 
-  // za brisanje timova mojih
   const handleDeleteTeam = async (teamId) => {
   try {
     await deleteTeam(teamId);

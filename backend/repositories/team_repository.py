@@ -87,3 +87,11 @@ def deleteTeam(db: Session, team_id: int,user_id: int):
     db.delete(team)
     db.commit()
     return team 
+
+def getTeamsByModeratorAndSport(db: Session, user_id: int, sport: str):
+    statement = select(Team).where(
+        Team.moderator_user_id == user_id,
+        Team.team_sport == sport
+    )
+    results = db.exec(statement).all()
+    return results

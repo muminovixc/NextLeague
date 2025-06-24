@@ -23,7 +23,7 @@ const TeamsGrid = () => {
           teamName={team.name}
           description={`${team.team_sport} • ${team.country}`}
           role="Moderator"
-          teamImage={team.team_logo}
+          teamImage={team.team_logo || 'https://via.placeholder.com/150'}
         /></a>
       ))}
     </div>
