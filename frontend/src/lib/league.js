@@ -135,7 +135,7 @@ export async function getLeagueById(league_id){
 
 }
 
-export async function sendRequestForLeague(team_id) {
+export async function sendRequestForLeague(team_id, league_id) {
   
 }
 
