@@ -12,7 +12,7 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8000/user-info", {
+    fetch("http://localhost:8000/user/my_profile", {
       method: "GET",
       credentials: "include",
     })
