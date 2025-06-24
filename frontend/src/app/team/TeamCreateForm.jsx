@@ -16,8 +16,8 @@ export default function TeamCreateForm({ onClose, onTeamCreated }) {
 
   // Popular sports options
   const sportsOptions = [
-    'Football', 'Basketball', 'Volleyball', 'Tennis', 'Handball',
-    'Swimming', 'Athletics', 'Cycling', 'Boxing', 'Wrestling'
+    'Football', 'Basketball', 'Volleyball', 'Handball',
+    'Gaming'
   ];
 
   // Popular countries
@@ -34,7 +34,6 @@ export default function TeamCreateForm({ onClose, onTeamCreated }) {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (error) setError(null);
   };
 
