@@ -33,11 +33,7 @@ def createMyLeague(session: Session, token: str, data: LeagueCreate):
 
         return league_repository.createMyLeague(session, user_id, data)
     except Exception as e:
-        error_message = str(e)
-        if (
-            "check_user_moderation_limits" in error_message or 
-            "dostigao maksimalan broj liga" in error_message
-        ):
+        if "maximum league moderation limit" in str(e):
             raise HTTPException(status_code=403, detail="PREMIUM_REQUIRED")
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -31,11 +31,32 @@ def createTeam(db: Session, team: Team, user_id: int):
         db.add(team)
         db.commit()
         db.refresh(team)
-        return team
-    except Exception as e:
-        db.rollback() 
-        raise e
 
+        member = TeamMembers(user_id=user_id, team_id=team.team_id)
+        db.add(member)
+
+        statistic = TeamStatistic(
+            moderator_user_id=user_id,
+            team_id=team.team_id,
+            league_id=None,  
+            number_of_matches_played=0,
+            number_of_wins=0,
+            number_of_draws=0,
+            number_of_losses=0,
+            win_points=0,
+            lose_points=0,
+            difference_points=0,
+            points=0
+        )
+        db.add(statistic)
+
+        db.commit()
+
+        return team
+
+    except Exception as e:
+        db.rollback()
+        raise e
 
 def GetAllTeams(db: Session):
     statement = select(Team)

@@ -154,3 +154,32 @@ export async function getMyTeamsModerator(league_sport) {
     throw error;
   }
 }
+
+
+export async function getRequestsForTeam() {
+  const res = await fetch(`${API_URL}/request/getRequestsForTeam`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch team requests");
+  return res.json();
+}
+
+
+export async function createRequestForTeam(team_id) {
+  const res = await fetch(`${API_URL}/request/createRequestForTeam`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ team_id }),
+  });
+
+  if (!res.ok) throw new Error("Failed to send join request");
+  return res.json();
+}
