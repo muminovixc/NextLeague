@@ -133,3 +133,24 @@ return fetch(`${API_URL}/team/deleteMyTeam/${teamId}`, {
     throw error;
   });
 }
+
+export async function getMyTeamsModerator(league_sport) {
+  try {
+    const res = await fetch(`${API_URL}/team/getMyTeamsModeratorFiltered?league_sport=${encodeURIComponent(league_sport)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch moderator teams');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Greška u getMyTeamsModerator:", error);
+    throw error;
+  }
+}
