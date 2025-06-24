@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { getMyTeamsModerator } from '../../lib/team';
+import { createRequestForLeague } from '../../lib/request'
 
 const getEmojiForSport = (sport) => {
   switch (sport) {
@@ -25,7 +27,6 @@ const getImageForSport = (sport) => {
   }
 };
 
-
 const LeagueCard = ({ league, showRequest, onDelete }) => {
   const router = useRouter();
   const bgImage = getImageForSport(league.sport);
@@ -35,37 +36,28 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
   const handleRequestClick = async () => {
     console.log("Selected sport:", league.sport);
 
-    // Simulacija poziva getMyTeamsModerator(league.sport)
-    // const teams = await getMyTeamsModerator(league.sport);
+    try {
+      const teams = await getMyTeamsModerator(league.sport);
+      setSimulatedTeams(teams);
+    } catch (error) {
+      console.error("Failed to fetch teams:", error);
+      setSimulatedTeams([]);
+    }
 
-    const teams = [
-      {
-        team_id: 1,
-        name: "Team A",
-        team_logo: "/images/logo1.png",
-        team_sport: "Football"
-      },
-      {
-        team_id: 2,
-        name: "Team B",
-        team_logo: "/images/logo2.png",
-        team_sport: "Basketball"
-      },
-      {
-        team_id: 3,
-        name: "Team C",
-        team_logo: "/images/logo3.png",
-        team_sport: "Gaming"
-      }
-    ];
-
-    setSimulatedTeams(teams);
     setShowTeamOptions(true);
   };
 
-  const handleSendRequest = (team_id) => {
-    console.log("Sending request for league", league.league_id, "with team", team_id);
-    alert("Request sent successfully for Team ID: " + team_id);
+  const handleSendRequest = async (team_id) => {
+    try {
+      await createRequestForLeague({
+      team_id: team_id,
+      league_id: league.league_id
+    });
+      alert("Request sent successfully for Team ID: " + team_id);
+    } catch (err) {
+      console.error("Error sending request:", err);
+      alert("Failed to send request");
+    }
   };
 
   return (

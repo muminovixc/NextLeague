@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getMyLeagues, getAllLeagues, deleteMyLeague } from '../../lib/league';
+import { getRequestsForLeague} from '../../lib/request';
 import CreateLeagueModal from './CreateLeagueForm';
 import LeagueCard from './LeagueCard';
+import RequestModal from './RequestModal';
 
 
 function sortLeagues(leagues, dateOrder, teamsOrder) {
@@ -60,6 +62,7 @@ export default function LeaguePage() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [showRequests, setShowRequests] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [deletingLeagueId, setDeletingLeagueId] = useState(null);
@@ -140,7 +143,12 @@ export default function LeaguePage() {
   return (
     <div className="max-w-7xl mx-auto px-8 py-12">
       <h1 className="text-4xl font-bold text-white mb-6">League Management</h1>
-
+        <button
+        onClick={() => setShowRequests(true)}
+        className="bg-[#0c969c] text-white px-6 py-2 rounded-md hover:bg-[#0a7075] ml-4"
+      >
+        Show Join Requests
+      </button>
       {/* My Leagues */}
       <div className="bg-[#031716] p-6 rounded-lg border border-[#0c969c]/20 mb-10">
         <h2 className="text-2xl font-bold text-white mb-4">My Leagues</h2>
@@ -201,6 +209,8 @@ export default function LeaguePage() {
           </div>
         </div>
       )}
+      {showRequests && <RequestModal onClose={() => setShowRequests(false)} />}
     </div>
+    
   );
 }

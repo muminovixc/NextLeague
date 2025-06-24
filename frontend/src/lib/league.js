@@ -136,6 +136,10 @@ export async function getLeagueById(league_id){
 }
 
 export async function sendRequestForLeague(team_id, league_id) {
-  
+  console.log("OVOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+  console.log("OVOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+
+  console.log(team_id);
+  console.log(league_id);
 }
 
