@@ -67,7 +67,7 @@ def getTeamById(db: Session, team_id: int):
     statement = (
         select(Team, TeamStatistic,League)
         .join(TeamStatistic, Team.team_id == TeamStatistic.team_id)
-        .join(League, TeamStatistic.league_id == League.league_id)
+.outerjoin(League, TeamStatistic.league_id == League.league_id) 
         .where(Team.team_id == team_id)
     )
     result = db.exec(statement).first()

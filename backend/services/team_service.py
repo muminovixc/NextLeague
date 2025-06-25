@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 from models.team_model import Team,TeamStatistic
+from models.team_members_models import TeamMembers
 from typing import List, Optional
 from auth.jwt_utils import decode_access_token
 import traceback
