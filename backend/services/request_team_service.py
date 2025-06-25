@@ -68,11 +68,11 @@ def accept_request(session: Session, request_id: int):
         request.is_reviewed = True
         request.is_accepted = True
 
-        # ➕ PROVJERI DA LI KORISNIK VEĆ POSTOJI
+        # PROVJERI POSTOJI LI VEĆ U team_members
         existing = session.exec(
             select(TeamMembers).where(
-                TeamMembers.user_id == request.sender_id,
-                TeamMembers.team_id == request.team_id
+                (TeamMembers.user_id == request.sender_id) &
+                (TeamMembers.team_id == request.team_id)
             )
         ).first()
 

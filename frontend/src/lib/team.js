@@ -183,3 +183,9 @@ export async function createRequestForTeam(team_id) {
   if (!res.ok) throw new Error("Failed to send join request");
   return res.json();
 }
+
+export async function getCalendarForTeam(teamId) {
+  const res = await fetch(`${API_URL}/team/calendar/team/${teamId}`);
+  if (!res.ok) throw new Error("Failed to fetch calendar");
+  return res.json();
+}

@@ -24,3 +24,6 @@ class RequestTeam(SQLModel, table=True):
     team_id: int = Field(foreign_key="team.team_id")
     is_reviewed: bool = Field(default=False)
     is_accepted: Optional[bool] = Field(default=None)
+
+
+
