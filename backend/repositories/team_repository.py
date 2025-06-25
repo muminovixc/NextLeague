@@ -1,9 +1,13 @@
 from sqlmodel import Session, select
 from sqlalchemy import or_
+from sqlalchemy.orm import aliased
+
 from models.team_model import Team
 from models.team_model import TeamStatistic
 from models.user_model import User
 from models.league_model import League
+from models.league_model import Calendar
+
 from models.team_members_models import TeamMembers
 
 from typing import List, Optional
@@ -130,3 +134,40 @@ def getTeamsByModeratorAndSport(db: Session, user_id: int, sport: str):
     )
     results = db.exec(statement).all()
     return results
+
+
+def get_calendar_by_team_id(session: Session, team_id: int):
+    TeamOne = aliased(Team)
+    TeamTwo = aliased(Team)
+
+    stmt = (
+        select(
+            Calendar,
+            TeamOne.name.label("team_one_name"),
+            TeamTwo.name.label("team_two_name")
+        )
+        .join(TeamOne, Calendar.team_one_id == TeamOne.team_id)
+        .join(TeamTwo, Calendar.team_two_id == TeamTwo.team_id)
+        .where((Calendar.team_one_id == team_id) | (Calendar.team_two_id == team_id))
+        .order_by(Calendar.date.asc())
+    )
+
+    results = session.exec(stmt).all()
+
+    matches = []
+    for calendar, team_one_name, team_two_name in results:
+        matches.append({
+            "id": calendar.id,
+            "league_id": calendar.league_id,
+            "team_one_id": calendar.team_one_id,
+            "team_two_id": calendar.team_two_id,
+            "date": calendar.date,
+            "status": calendar.status,
+            "statistic_after_match_id": calendar.statistic_after_match_id,
+            "team_one_name": team_one_name,
+            "team_two_name": team_two_name,
+            "result": None,  # ili generiši na osnovu podataka
+            "location": "Online"  # ako nemaš polje za lokaciju
+        })
+
+    return matches

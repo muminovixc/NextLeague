@@ -180,6 +180,16 @@ export default function TeamPage() {
               Create Team
             </button>
           </div>
+           <div className="flex justify-end mb-6">
+          <button
+            onClick={() => setShowRequestsModal(true)}
+            className="bg-[#274d60] px-6 py-3 rounded-xl text-[#6ba3be] font-semibold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-[#0c969c]/25 flex items-center gap-2 border border-[#0a7075] hover:border-[#0c969c] hover:bg-[#0a7075]"
+          >
+            <Settings className="w-4 h-4" />
+            Show All Join Requests
+          </button>
+        </div>
+
 
 {showMyTeams && (
           myTeams.length === 0 ? (
@@ -383,16 +393,7 @@ export default function TeamPage() {
 
 
         {/* Show Requests Button */}
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => setShowRequestsModal(true)}
-            className="bg-[#274d60] px-6 py-3 rounded-xl text-[#6ba3be] font-semibold hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-[#0c969c]/25 flex items-center gap-2 border border-[#0a7075] hover:border-[#0c969c] hover:bg-[#0a7075]"
-          >
-            <Settings className="w-4 h-4" />
-            Show All Join Requests
-          </button>
-        </div>
-
+       
         {/* Modal za sve requestove */}
         {showRequestsModal && <RequestTeamModal onClose={() => setShowRequestsModal(false)} />}
 
