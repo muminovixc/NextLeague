@@ -8,6 +8,8 @@ from models.team_members_models import TeamMembers
 from typing import List, Optional
 from auth.jwt_utils import decode_access_token
 import traceback
+
+
 def getMyTeams(db: Session, token: str):  
     try:
         statement = decode_access_token(token)
@@ -167,3 +169,7 @@ def getMyTeamsModeratorFiltered(db: Session, token: str, league_sport: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Greška: {str(e)}")
+
+
+def get_calendar_for_team(session: Session, team_id: int):
+    return TeamRepository.get_calendar_by_team_id(session, team_id)
