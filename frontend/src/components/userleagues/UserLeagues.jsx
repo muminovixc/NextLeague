@@ -2,11 +2,17 @@ import { useState, useEffect } from 'react';
 import { getMyLeagues } from '../../lib/league';
 
 const sportIcons = {
-  Football: '⚽',
-  Basketball: '🏀',
-  Volleyball: '🏐',
-  Tennis: '🎾',
-  Handball: '🤾',
+  fudbal: '⚽',
+  kosarka: '🏀',
+  odbojka: '🏐',
+  rukomet: '🤾',
+};
+
+const sportMap = {
+  Football: 'fudbal',
+  Basketball: 'kosarka',
+  Volleyball: 'odbojka',
+  Handball: 'rukomet',
 };
 
 export default function UserLeagues({ selectedSport }) {
@@ -20,11 +26,13 @@ export default function UserLeagues({ selectedSport }) {
         setLoading(true);
 
         const response = await getMyLeagues();
+        console.log('Sve lige:', response);
 
         // ✅ response je niz liga, ne objekat sa .leagues
-        const filteredLeagues = (response || []).filter(league =>
-          league.sport.toLowerCase() === selectedSport.toLowerCase()
-        );
+        const filteredLeagues = (response || []).filter(league => {
+          const mapped = sportMap[league.sport] || league.sport.trim().toLowerCase();
+          return mapped === selectedSport.trim().toLowerCase();
+        });
 
         setLeagues(filteredLeagues);
         setError(null);
