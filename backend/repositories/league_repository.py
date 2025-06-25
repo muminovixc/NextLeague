@@ -54,7 +54,7 @@ def getLeagueById(session: Session, league_id: int) -> League | None:
     result = session.exec(statement).first()
     return result
 
-def get_leagues_for_user(db, user_id: int):
+def get_leagues_for_user(db:Session, user_id: int):
     statement = select(League).where(League.moderator_user_id == user_id)
     results = db.exec(statement)
     return results.all()

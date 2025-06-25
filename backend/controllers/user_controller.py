@@ -47,9 +47,9 @@ async def update_my_profile(
     )
 
 @router.get("/{user_id}/teams")
-def get_user_teams(user_id: int, session: Session = Depends(get_session)):
+def get_user_teams(user_id: int, session: Session = Depends(get_db)):
     return user_service.get_teams_for_user(session, user_id)
 
 @router.get("/{user_id}/leagues")
-def get_user_leagues(user_id: int, session: Session = Depends(get_session)):
+def get_user_leagues(user_id: int, session: Session = Depends(get_db)):
     return user_service.get_leagues_for_user(session, user_id)

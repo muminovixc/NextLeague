@@ -135,8 +135,12 @@ async def update_my_profile(
     # Vrati ažuriran profil
     return get_my_profile(db, token)
 
-def get_teams_for_user(session, user_id: int):
-    return repo_get_teams_for_user(session, user_id)
+def get_teams_for_user(session:Session, user_id: int):
+    teams = repo_get_teams_for_user(session, user_id)
+    print("DEBUG TEAMS:", teams)
+    return [team.dict() if hasattr(team, 'dict') else (team[0].dict() if team and hasattr(team[0], 'dict') else None) for team in teams]
 
-def get_leagues_for_user(session, user_id: int):
-    return repo_get_leagues_for_user(session, user_id)
+def get_leagues_for_user(session:Session, user_id: int):
+    leagues = repo_get_leagues_for_user(session, user_id)
+    print("DEBUG LEAGUES:", leagues)
+    return [league.dict() if hasattr(league, 'dict') else (league[0].dict() if league and hasattr(league[0], 'dict') else None) for league in leagues]

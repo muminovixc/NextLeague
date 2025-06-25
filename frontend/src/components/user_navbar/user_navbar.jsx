@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import SportSelector from "../userteams/SportSelector";
 import UserTeams from "../userteams/UserTeams";
 import UserLeagues from "../userleagues/UserLeagues";
+import FootballCalendar from "../user_calendar/FootballCalendar";
 
 export default function UserNavbar() {
   const [activeMenu, setActiveMenu] = useState(null);
@@ -46,6 +47,12 @@ export default function UserNavbar() {
         <div className="mt-6">
           <SportSelector selectedSport={selectedSport} onSportSelect={setSelectedSport} />
           <UserLeagues selectedSport={selectedSport} />
+        </div>
+      )}
+
+      {activeMenu === "svi_mecevi" && (
+        <div className="mt-6">
+          <FootballCalendar />
         </div>
       )}
     </div>
