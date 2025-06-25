@@ -25,3 +25,12 @@ class LeagueCreate(BaseModel):
     number_of_players_in_team: int
     country: str
     access: Literal["PUBLIC", "PRIVATE"]
+
+class AddTeamInLeague(BaseModel):
+    league_id: int
+    team_id: int
+    sender_id: int  # sada se koristi kao moderator_user_id za LeagueStatistic(to je moderator tima)
+    request_id: int # za azuriranje polja is_reviewed i is_accepted
+
+class StartLeagueRequest(BaseModel):
+    league_id: int

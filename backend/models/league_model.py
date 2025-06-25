@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
 # SQLAlchemy Model
 
 
@@ -44,3 +44,43 @@ class LeagueTeamStatisticsView(SQLModel, table=True):
     lose_points: int
     difference_points: int
     points: int
+
+class LeagueTeam(SQLModel, table=True):
+    __tablename__ = "league_teams"
+
+    league_id: int = Field(foreign_key="league.league_id", primary_key=True)
+    team_id: int = Field(foreign_key="team.team_id", primary_key=True)
+
+class StatisticAfterMatch(SQLModel, table=True):
+    __tablename__ = "statistic_after_match"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    
+    league_id: int = Field(foreign_key="league.league_id")
+    team_one_id: int = Field(foreign_key="team.team_id")
+    team_two_id: int = Field(foreign_key="team.team_id")
+    
+    team_one_moderator_id: int = Field(foreign_key="users.id")
+    team_two_moderator_id: int = Field(foreign_key="users.id")
+    
+    winner_id: Optional[int] = Field(default=None, foreign_key="team.team_id")
+    looser_id: Optional[int] = Field(default=None, foreign_key="team.team_id")
+    
+    win_points: Optional[int] = None
+    lose_points: Optional[int] = None
+    
+    best_player_id: Optional[int] = Field(default=None, foreign_key="users.id")
+    
+    event_time: datetime = Field(default_factory=datetime.utcnow)
+
+class Calendar(SQLModel, table=True):
+    __tablename_ = "calendar"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    league_id: int = Field(foreign_key="league.league_id")
+    team_one_id: int = Field(foreign_key="team.team_id")
+    team_two_id: int = Field(foreign_key="team.team_id")
+    date: datetime
+    statistic_after_match_id: Optional[int] = Field(default=None, foreign_key="statistic_after_match.id")
+    status: str = Field(default="SCHEDULED")
+

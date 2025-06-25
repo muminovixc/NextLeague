@@ -1,6 +1,8 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import { getRequestsForLeague } from '../../lib/request';
+import { addTeamInLeague } from '../../lib/league'; // pretpostavka gdje je funkcija
 
 export default function RequestModal({ onClose }) {
   const [requests, setRequests] = useState([]);
@@ -9,6 +11,7 @@ export default function RequestModal({ onClose }) {
     const fetchRequests = async () => {
       try {
         const data = await getRequestsForLeague();
+        console.log(data);
         setRequests(data);
       } catch (err) {
         console.error('Error loading requests:', err);
@@ -18,10 +21,21 @@ export default function RequestModal({ onClose }) {
     fetchRequests();
   }, []);
 
-  const handleAccept = async (id) => {
-    console.log('Accepted request ID:', id);
-    // TODO: API poziv za prihvatanje requesta
-    setRequests(prev => prev.filter(req => req.id !== id));
+  const handleAccept = async (req) => {
+    const payload = {
+      league_id: req.league_id,
+      team_id: req.team_id,
+      sender_id: req.sender_id,
+      request_id: req.id,
+    };
+
+    try {
+      console.log("Sending to backend:", payload);
+      await addTeamInLeague(payload);
+      setRequests(prev => prev.filter(r => r.id !== req.id));
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    }
   };
 
   const handleDecline = async (id) => {
@@ -43,11 +57,11 @@ export default function RequestModal({ onClose }) {
         <ul className="space-y-4 max-h-[400px] overflow-y-auto">
           {requests.map((req) => (
             <li key={req.id} className="p-4 bg-[#072222] rounded-lg border border-[#0c969c]/30">
-              <p className="text-sm mb-1">Team ID: <strong>{req.team_id}</strong></p>
-              <p className="text-sm mb-1">League ID: <strong>{req.league_id}</strong></p>
-              <p className="text-sm mb-2">Sender ID: <strong>{req.sender_id}</strong></p>
+              <p className="text-sm mb-1">Team: <strong>{req.team_name}</strong></p>
+              <p className="text-sm mb-1">League: <strong>{req.league_name}</strong></p>
+              <p className="text-sm mb-2">Sender: <strong>{req.sender_full_name}</strong></p>
               <div className="flex gap-2">
-                <button onClick={() => handleAccept(req.id)} className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded">Accept</button>
+                <button onClick={() => handleAccept(req)} className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded">Accept</button>
                 <button onClick={() => handleDecline(req.id)} className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Decline</button>
               </div>
             </li>

@@ -32,6 +32,8 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
   const bgImage = getImageForSport(league.sport);
   const [showTeamOptions, setShowTeamOptions] = useState(false);
   const [simulatedTeams, setSimulatedTeams] = useState([]);
+  const [toast, setToast] = useState({ message: '', type: '' });
+
 
   const handleRequestClick = async () => {
     console.log("Selected sport:", league.sport);
@@ -50,17 +52,44 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
   const handleSendRequest = async (team_id) => {
     try {
       await createRequestForLeague({
-      team_id: team_id,
-      league_id: league.league_id
-    });
-      alert("Request sent successfully for Team ID: " + team_id);
+        team_id: team_id,
+        league_id: league.league_id
+      });
+
+      setToast({ message: 'Request sent successfully.', type: 'success' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
     } catch (err) {
       console.error("Error sending request:", err);
-      alert("Failed to send request");
+      const msg = err?.message || '';
+
+      if (msg === "Request already sent and awaiting review.") {
+        setToast({
+          message: 'Request already pending for this team.',
+          type: 'error',
+        });
+      } else {
+        setToast({
+          message: 'Failed to send request.',
+          type: 'error',
+        });
+      }
+
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
     }
   };
 
   return (
+    <>
+    {toast.message && (
+      <div
+        className={`fixed top-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg ${
+          toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        } text-white`}
+      >
+        {toast.message}
+      </div>
+    )}
+
     <div
       className="relative p-6 rounded-lg border border-[#0c969c]/20 overflow-hidden"
       style={{
@@ -147,6 +176,7 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
