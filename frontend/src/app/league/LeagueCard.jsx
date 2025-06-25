@@ -1,7 +1,9 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { getMyTeamsModerator } from '../../lib/team';
+import { createRequestForLeague } from '../../lib/request'
 
 const getEmojiForSport = (sport) => {
   switch (sport) {
@@ -28,8 +30,66 @@ const getImageForSport = (sport) => {
 const LeagueCard = ({ league, showRequest, onDelete }) => {
   const router = useRouter();
   const bgImage = getImageForSport(league.sport);
+  const [showTeamOptions, setShowTeamOptions] = useState(false);
+  const [simulatedTeams, setSimulatedTeams] = useState([]);
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+
+  const handleRequestClick = async () => {
+    console.log("Selected sport:", league.sport);
+
+    try {
+      const teams = await getMyTeamsModerator(league.sport);
+      setSimulatedTeams(teams);
+    } catch (error) {
+      console.error("Failed to fetch teams:", error);
+      setSimulatedTeams([]);
+    }
+
+    setShowTeamOptions(true);
+  };
+
+  const handleSendRequest = async (team_id) => {
+    try {
+      await createRequestForLeague({
+        team_id: team_id,
+        league_id: league.league_id
+      });
+
+      setToast({ message: 'Request sent successfully.', type: 'success' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    } catch (err) {
+      console.error("Error sending request:", err);
+      const msg = err?.message || '';
+
+      if (msg === "Request already sent and awaiting review.") {
+        setToast({
+          message: 'Request already pending for this team.',
+          type: 'error',
+        });
+      } else {
+        setToast({
+          message: 'Failed to send request.',
+          type: 'error',
+        });
+      }
+
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  };
 
   return (
+    <>
+    {toast.message && (
+      <div
+        className={`fixed top-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg ${
+          toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        } text-white`}
+      >
+        {toast.message}
+      </div>
+    )}
+
     <div
       className="relative p-6 rounded-lg border border-[#0c969c]/20 overflow-hidden"
       style={{
@@ -50,17 +110,22 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
         <p className="text-[#6ba3be] mb-1">Teams: {league.number_of_teams}</p>
         <p className="text-[#6ba3be] mb-4">Players: {league.number_of_players_in_team}</p>
         <p className="text-[#6ba3be] mb-4">Country: {league.country}</p>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           {showRequest && (
-            <button className="bg-[#0c969c] text-white px-4 py-2 rounded-md hover:bg-[#0a7075]">
+            <button
+              className="bg-[#0c969c] text-white px-4 py-2 rounded-md hover:bg-[#0a7075]"
+              onClick={handleRequestClick}
+            >
               Send Request
             </button>
           )}
+
           <Link href={`/league/view/${league.league_id}`}>
             <button className="border border-[#0c969c] text-[#0c969c] px-4 py-2 rounded-md hover:bg-[#0c969c]/10 w-full text-left">
               View
             </button>
           </Link>
+
           {!showRequest && (
             <button
               onClick={() => onDelete(league.league_id)}
@@ -71,7 +136,47 @@ const LeagueCard = ({ league, showRequest, onDelete }) => {
           )}
         </div>
       </div>
+
+      {showTeamOptions && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+          <div className="bg-[#031716] p-6 rounded-lg border border-[#0c969c] w-full max-w-md">
+            <h2 className="text-xl font-bold text-white mb-4">Select a Team to Send Request</h2>
+            {simulatedTeams.length === 0 ? (
+              <p className="text-[#6ba3be]">No Created Teams</p>
+            ) : (
+              <div className="space-y-3">
+                {simulatedTeams.map(team => (
+                  <div key={team.team_id} className="flex items-center justify-between bg-[#032f30] px-4 py-2 rounded-md border border-[#0c969c]">
+                    <div className="flex items-center gap-4">
+                      <img src={team.team_logo} alt={team.name} className="w-10 h-10 rounded-full" />
+                      <div>
+                        <p className="text-white font-semibold">{team.name}</p>
+                        <p className="text-[#6ba3be] text-sm">{team.team_sport}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleSendRequest(team.team_id)}
+                      className="bg-[#0c969c] text-white px-4 py-1 rounded-md hover:bg-[#0a7075]"
+                    >
+                      Send Request
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setShowTeamOptions(false)}
+                className="text-white border border-gray-500 px-4 py-2 rounded-md hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </>
   );
 };
 

@@ -3,7 +3,8 @@ from schemas.team_schema import TeamCreate, TeamUpdate
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
-from models import team_model
+from models.team_model import Team,TeamStatistic
+from models.team_members_models import TeamMembers
 from typing import List, Optional
 from auth.jwt_utils import decode_access_token
 import traceback
@@ -88,44 +89,81 @@ def deleteTeam(db: Session, team_id: int, token: str):
         )
 
 
-def createTeam(db: Session, team: TeamCreate, token: str):
+def createTeam(db: Session, team: Team, token: str):
     try:
         statement = decode_access_token(token)
         user_id = statement.get("id")
         if not user_id:
             raise HTTPException(
-                status_code=401, 
+                status_code=401,
                 detail="User ID not found in token."
             )
 
+        # Postavi moderatora
         team.moderator_user_id = user_id
-        return TeamRepository.createTeam(db, team, user_id)
-    
+
+        # Dodaj tim i commitaj da dobije team_id
+        db.add(team)
+        db.commit()
+        db.refresh(team)
+
+        # Dodaj moderatora kao člana tima
+        member = TeamMembers(user_id=user_id, team_id=team.team_id)
+        db.add(member)
+
+        # Dodaj inicijalnu statistiku
+        statistic = TeamStatistic(
+            moderator_user_id=user_id,
+            team_id=team.team_id,
+            league_id=None,  # Ako se naknadno doda liga
+            number_of_matches_played=0,
+            number_of_wins=0,
+            number_of_draws=0,
+            number_of_losses=0,
+            win_points=0,
+            lose_points=0,
+            difference_points=0,
+            points=0
+        )
+        db.add(statistic)
+
+        db.commit()
+        return team
+
     except HTTPException:
-        # Re-raise HTTPException as is
         raise
-    
+
     except Exception as e:
+        db.rollback()
         error_msg = str(e)
         print(f"Error creating team: {error_msg}")
-        
-        # Provjeri da li je greška povezana sa maksimalnim brojem timova
+
         if "maksimalan broj timova" in error_msg.lower():
             raise HTTPException(
-                status_code=400, 
+                status_code=400,
                 detail="Dostigli ste maksimalan broj timova koji možete kreirati."
             )
-        
-        # Provjeri da li je SQLAlchemy/PostgreSQL greška
+
         if "psycopg2.errors.RaiseException" in error_msg:
             if "korisnik regular je dostigao maksimalan broj timova" in error_msg.lower():
                 raise HTTPException(
                     status_code=400,
                     detail="Dostigli ste maksimalan broj timova koji možete kreirati."
                 )
-        
-        # Za sve ostale greške
+
         raise HTTPException(
-            status_code=500, 
+            status_code=500,
             detail=f"Greška prilikom kreiranja tima: {error_msg}"
         )
+    
+def getMyTeamsModeratorFiltered(db: Session, token: str, league_sport: str):
+    try:
+        decoded = decode_access_token(token)
+        user_id = decoded.get("id")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+        return TeamRepository.getTeamsByModeratorAndSport(db, user_id, league_sport)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Greška: {str(e)}")

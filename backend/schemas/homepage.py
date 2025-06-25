@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import date
 from typing import Literal
 from typing import List
+from typing import Optional
 
 class UserResponse(BaseModel):
     id: int
@@ -39,7 +40,7 @@ class TeamRead(BaseModel):
     team_sport: str
     moderator_user_id: int
     country: str
-    team_logo: str
+    team_logo: Optional[str] = None
     team_identification: str
 
     class Config:

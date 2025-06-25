@@ -2,32 +2,46 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getLeaguesStatistic, getLeagueById } from '../../../../lib/league';
+import { getLeaguesStatistic, getLeagueById, getUserId, startLeague } from '../../../../lib/league';
 import { ArrowLeft } from 'lucide-react';
 
 export default function ViewLeaguePage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id;
+
   const [statistics, setStatistics] = useState([]);
   const [leagueName, setLeagueName] = useState('');
+  const [moderatorId, setModeratorId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState("success"); // or "error"
 
   const [sortConfig, setSortConfig] = useState({ key: 'points', direction: 'desc' });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const statData = await getLeaguesStatistic(id);
-        const leagueData = await getLeagueById(id);
+  const fetchData = async () => {
+    try {
+      const [statData, leagueData, userId] = await Promise.all([
+        getLeaguesStatistic(id),
+        getLeagueById(id),
+        getUserId(),
+      ]);
 
-        setStatistics(statData);
-        setLeagueName(leagueData.name);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
-  }, [id]);
+      setStatistics(statData);
+      setLeagueName(leagueData.name);
+      setModeratorId(leagueData.moderator_user_id);
+      setUserId(userId);
+
+      console.log("User ID:", userId);
+      console.log("Moderator ID:", leagueData.moderator_user_id);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  fetchData();
+}, [id]);
 
   const sortedTeams = [...statistics].sort((a, b) => {
     const { key, direction } = sortConfig;
@@ -75,24 +89,61 @@ export default function ViewLeaguePage() {
   return (
     <div className="p-4 md:p-8 bg-[#071c1b] min-h-screen text-white">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-center text-white">
-          {leagueName ? `${leagueName} - Standings` : `League #${id} - Standings`}
-        </h1>
-        <button
-          onClick={() => router.push('/league')}
-          className="inline-flex items-center gap-2 text-sm bg-[#0e2e2d] text-teal-400 hover:text-white hover:bg-[#183533] px-4 py-2 rounded-md border border-teal-800 transition"
-        >
-          <ArrowLeft size={18} /> Back to Leagues
-        </button>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white">
+            {leagueName ? `${leagueName} - Standings` : `League #${id} - Standings`}
+          </h1>
+
+          <div className="flex flex-wrap gap-2 justify-end">
+            <button
+              className="text-sm bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition"
+              onClick={() => router.push(`/league/${id}/schedule`)}
+            >
+              Schedule
+            </button>
+
+            {userId && moderatorId && parseInt(userId) === parseInt(moderatorId) && (
+              <button
+                className="text-sm bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md transition"
+                onClick={async () => {
+                  try {
+                    const res = await startLeague(id);
+                    setMessage("League successfully started.");
+                    setMessageType("success");
+                    setTimeout(() => setMessage(null), 4000);
+                  } catch (error) {
+                    console.error("Error starting league:", error);
+                    setMessage("Error: " + (error?.message || "Unable to start league"));
+                    setMessageType("error");
+                    setTimeout(() => setMessage(null), 4000);
+                  }
+                }}
+              >
+                Start
+              </button>
+            )}
+
+            <button
+              onClick={() => router.push('/league')}
+              className="inline-flex items-center gap-2 text-sm bg-[#0e2e2d] text-teal-400 hover:text-white hover:bg-[#183533] px-4 py-2 rounded-md border border-teal-800 transition"
+            >
+              <ArrowLeft size={18} /> Back to Leagues
+            </button>
+          </div>
+        </div>
       </div>
+      {message && (
+        <div className={`max-w-md mx-auto mt-4 mb-4 px-4 py-2 rounded-md text-sm font-medium text-center shadow-md
+          ${messageType === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+          {message}
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-[#0e2e2d] rounded-xl overflow-hidden shadow-lg border border-teal-800 text-sm md:text-base">
           <thead className="bg-[#0a2423] text-teal-400 uppercase tracking-wide select-none">
             <tr>
-              <th className="px-4 py-3 text-left cursor-pointer" onClick={() => onSort('rank')}>
-                #
-              </th>
+              <th className="px-4 py-3 text-left cursor-pointer" onClick={() => onSort('rank')}>#</th>
               <th className="px-4 py-3 text-left cursor-pointer" onClick={() => onSort('team_name')}>
                 Team {getSortArrow('team_name')}
               </th>

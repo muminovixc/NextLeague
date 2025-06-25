@@ -31,11 +31,32 @@ def createTeam(db: Session, team: Team, user_id: int):
         db.add(team)
         db.commit()
         db.refresh(team)
-        return team
-    except Exception as e:
-        db.rollback() 
-        raise e
 
+        member = TeamMembers(user_id=user_id, team_id=team.team_id)
+        db.add(member)
+
+        statistic = TeamStatistic(
+            moderator_user_id=user_id,
+            team_id=team.team_id,
+            league_id=None,  
+            number_of_matches_played=0,
+            number_of_wins=0,
+            number_of_draws=0,
+            number_of_losses=0,
+            win_points=0,
+            lose_points=0,
+            difference_points=0,
+            points=0
+        )
+        db.add(statistic)
+
+        db.commit()
+
+        return team
+
+    except Exception as e:
+        db.rollback()
+        raise e
 
 def GetAllTeams(db: Session):
     statement = select(Team)
@@ -46,7 +67,7 @@ def getTeamById(db: Session, team_id: int):
     statement = (
         select(Team, TeamStatistic,League)
         .join(TeamStatistic, Team.team_id == TeamStatistic.team_id)
-        .join(League, TeamStatistic.league_id == League.league_id)
+.outerjoin(League, TeamStatistic.league_id == League.league_id) 
         .where(Team.team_id == team_id)
     )
     result = db.exec(statement).first()
@@ -102,3 +123,10 @@ def get_teams_for_user(db, user_id: int):
     )
     results = db.exec(statement)
     return results.all() 
+def getTeamsByModeratorAndSport(db: Session, user_id: int, sport: str):
+    statement = select(Team).where(
+        Team.moderator_user_id == user_id,
+        Team.team_sport == sport
+    )
+    results = db.exec(statement).all()
+    return results
