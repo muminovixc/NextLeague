@@ -3,7 +3,7 @@ import SportSelector from './SportSelector';
 import UserLeagues from './UserLeagues';
 
 export default function UserLeaguesSection() {
-  const [selectedSport, setSelectedSport] = useState('Football');
+  const [selectedSport, setSelectedSport] = useState('fudbal');
 
   return (
     <div className="p-6 rounded-2xl" style={{ backgroundColor: '#031716' }}>

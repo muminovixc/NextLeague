@@ -1,4 +1,4 @@
-from sqlmodel import Session, select
+from sqlmodel import Session
 from models.user_model import User
 from schemas.user_schema import UserUpdate
 from fastapi import HTTPException

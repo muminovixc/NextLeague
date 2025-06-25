@@ -1,10 +1,9 @@
 export default function SportSelector({ selectedSport, onSportSelect }) {
   const sports = [
-    { id: 'football', name: 'Football', icon: '⚽' },
-    { id: 'basketball', name: 'Basketball', icon: '🏀' },
-    { id: 'volleyball', name: 'Volleyball', icon: '🏐' },
-    { id: 'tennis', name: 'Tennis', icon: '🎾' },
-    { id: 'handball', name: 'Handball', icon: '🤾' }
+    { id: 'fudbal', name: 'fudbal', displayName: 'Fudbal', icon: '⚽' },
+    { id: 'kosarka', name: 'kosarka', displayName: 'Košarka', icon: '🏀' },
+    { id: 'odbojka', name: 'odbojka', displayName: 'Odbojka', icon: '🏐' },
+    { id: 'rukomet', name: 'rukomet', displayName: 'Rukomet', icon: '🤾' }
   ];
 
   return (
@@ -30,7 +29,7 @@ export default function SportSelector({ selectedSport, onSportSelect }) {
           }}
         >
           <span className="text-base">{sport.icon}</span>
-          <span>{sport.name}</span>
+          <span>{sport.displayName}</span>
         </button>
       ))}
     </div>

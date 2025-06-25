@@ -2,11 +2,17 @@ import { useState, useEffect } from 'react';
 import { getMyTeam } from '../../lib/team';
 
 const sportIcons = {
-  Football: '⚽',
-  Basketball: '🏀',
-  Volleyball: '🏐',
-  Tennis: '🎾',
-  Handball: '🤾',
+  fudbal: '⚽',
+  kosarka: '🏀',
+  odbojka: '🏐',
+  rukomet: '🤾',
+};
+
+const sportMap = {
+  Football: 'fudbal',
+  Basketball: 'kosarka',
+  Volleyball: 'odbojka',
+  Handball: 'rukomet',
 };
 
 export default function UserTeams({ selectedSport }) {
@@ -19,10 +25,12 @@ export default function UserTeams({ selectedSport }) {
       try {
         setLoading(true);
         const response = await getMyTeam();
+        console.log('Svi timovi:', response.teams);
         // Filter teams based on selected sport
-        const filteredTeams = response.teams.filter(team => 
-          team.team_sport.toLowerCase() === selectedSport.toLowerCase()
-        );
+        const filteredTeams = response.teams.filter(team => {
+          const mapped = sportMap[team.team_sport] || team.team_sport.trim().toLowerCase();
+          return mapped === selectedSport.trim().toLowerCase();
+        });
         setTeams(filteredTeams);
         setError(null);
       } catch (error) {
