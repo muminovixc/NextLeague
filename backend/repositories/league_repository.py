@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlmodel import Session, select
 from models.request_model import RequestLeague
-from models.team_model import TeamStatistic
-from models.league_model import Calendar, League, LeagueStatistic, LeagueTeam,LeagueTeamStatisticsView
+from models.team_model import Team, TeamStatistic
+from models.league_model import Calendar, League, LeagueStatistic, LeagueTeam,LeagueTeamStatisticsView, StatisticAfterMatch
 from schemas.league_schema import AddTeamInLeague, LeagueCreate
 
 def getMyLeagues(db: Session, user_id: int):
@@ -108,3 +108,46 @@ def calendar_exists_for_league(session: Session, league_id: int) -> bool:
         select(Calendar).where(Calendar.league_id == league_id)
     ).first()
     return result is not None
+
+def getCalendarForLeague(session: Session, league_id: int):
+    statement = select(Calendar).where(Calendar.league_id == league_id)
+    results = session.exec(statement).all()
+
+    calendar_with_data = []
+
+    for match in results:
+        team_one = session.get(Team, match.team_one_id)
+        team_two = session.get(Team, match.team_two_id)
+
+        match_data = {
+            "id": match.id,
+            "date": match.date,
+            "status": match.status,
+            "team_one": {
+                "id": team_one.team_id,
+                "name": team_one.name,
+                "logo": team_one.team_logo,  # ✅ ispravljen naziv
+            },
+            "team_two": {
+                "id": team_two.team_id,
+                "name": team_two.name,
+                "logo": team_two.team_logo,  # ✅ ispravljen naziv
+            },
+        }
+
+        # Ako je utakmica odigrana i postoji statistika, dodaj i to
+        if match.statistic_after_match_id:
+            stat = session.get(StatisticAfterMatch, match.statistic_after_match_id)
+            if stat:
+                match_data["statistic"] = {
+                    "winner_id": stat.winner_id,
+                    "looser_id": stat.looser_id,
+                    "win_points": stat.win_points,
+                    "lose_points": stat.lose_points,
+                    "best_player_id": stat.best_player_id,
+                    "event_time": stat.event_time
+                }
+
+        calendar_with_data.append(match_data)
+
+    return calendar_with_data

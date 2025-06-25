@@ -82,3 +82,12 @@ def get_user_id(request: Request):
         return JSONResponse(status_code=401, content={"detail": "Invalid token"})
 
     return {"user_id": payload.get("id")}
+
+@router.get("/getCalendarForLeague/{league_id}")
+def getCalendarForLeague(league_id: int, request: Request, session: Session = Depends(get_session)):
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    return league_service.getCalendarForLeague(session, league_id)
+

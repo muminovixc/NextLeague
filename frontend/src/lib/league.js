@@ -199,3 +199,22 @@ export async function startLeague(leagueId) {
     throw error;
   }
 };
+
+export async function getCalendarForLeague(leagueId) {
+  try {
+    const res = await fetch(`${API_URL}/league/getCalendarForLeague/${leagueId}`, {
+      method: 'GET',
+      credentials: 'include', // da pošalje cookies (token)
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch calendar for league: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching league calendar:", error);
+    throw error;
+  }
+}
