@@ -11,6 +11,16 @@ class RequestLeague(SQLModel, table=True):
     sender_id: int = Field(foreign_key="users.id")
     receiver_id: int = Field(foreign_key="users.id")
     
-    is_reviewed: bool = Field(default=False)     # false dok moderator ne odluči
+    is_reviewed: bool = Field(default=False)    
     is_accepted: Optional[bool] = Field(default=None)  
-    # None dok nije odlučeno, True ako je prihvaćeno, False ako je odbijeno
+
+
+class RequestTeam(SQLModel, table=True):
+    __tablename__ = "request_team"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    sender_id: int = Field(foreign_key="users.id")
+    receiver_id: int = Field(foreign_key="users.id")
+    team_id: int = Field(foreign_key="team.team_id")
+    is_reviewed: bool = Field(default=False)
+    is_accepted: Optional[bool] = Field(default=None)
