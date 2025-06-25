@@ -135,3 +135,9 @@ def start_league(session: Session, token: str, league_id: int):
 
     session.commit()
     return {"message": "League started and calendar created."}
+
+def getCalendarForLeague(session: Session, league_id: int):
+    try:
+        return league_repository.getCalendarForLeague(session, league_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
