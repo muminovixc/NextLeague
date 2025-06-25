@@ -7,3 +7,4 @@ pip install stripe
 npm install @mui/material @emotion/react @emotion/styled
 npm install @heroicons/react  // za ikone
 # za pokretanje je :  uvicorn backend.main:app --reload
+npm install recharts
