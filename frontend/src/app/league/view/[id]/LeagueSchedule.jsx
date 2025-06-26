@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react"
 import { Calendar, Clock, Trophy, Users } from "lucide-react"
 import { getCalendarForLeague } from "../../../../lib/league"
+import InsertStatisticModal from "./InsertStatistic"
 
 export default function LeagueSchedule({ leagueId }) {
   const [schedule, setSchedule] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showStatisticModal, setShowStatisticModal] = useState(false)
+  const [selectedMatch, setSelectedMatch] = useState(null)
 
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
         const data = await getCalendarForLeague(leagueId)
+        console.log("Schedule data:", data) // Debug: Proverite šta sadrži match objekat
         setSchedule(data)
       } catch (error) {
         console.error("Error fetching schedule:", error)
@@ -22,6 +26,10 @@ export default function LeagueSchedule({ leagueId }) {
 
     if (leagueId) fetchSchedule()
   }, [leagueId])
+
+  const isMatchFinished = (matchDate) => {
+    return new Date() > new Date(matchDate)
+  }
 
   if (loading) {
     return (
@@ -135,6 +143,26 @@ export default function LeagueSchedule({ leagueId }) {
                     <Clock className="w-4 h-4 text-[#6ba3be]" />
                     <span className="text-[#6ba3be] font-medium text-sm">{date}</span>
                   </div>
+                  {isMatchFinished(match.date) && match.status === "SCHEDULED" && (
+                    <button
+                      onClick={() => {
+                        // Dodajemo dodatne podatke u selectedMatch objekat
+                        const matchWithIds = {
+                          ...match,
+                          team_one_id: match.team_one.id,
+                          team_two_id: match.team_two.id,
+                          league_id: leagueId, // Dodajemo i league_id ako nije već u match objektu
+                        }
+                        console.log("Selected match with IDs:", matchWithIds) // Debug
+                        setSelectedMatch(matchWithIds)
+                        setShowStatisticModal(true)
+                      }}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0c969c] to-[#6ba3be] text-white px-4 py-2 rounded-lg hover:from-[#6ba3be] hover:to-[#0c969c] transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm"
+                    >
+                      <Trophy className="w-4 h-4" />
+                      Insert Statistic
+                    </button>
+                  )}
                   <div
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       isCompleted ? "bg-[#0c969c] text-white" : "bg-[#0a7075] text-[#6ba3be]"
@@ -159,6 +187,25 @@ export default function LeagueSchedule({ leagueId }) {
           <span>{schedule.length} matches in schedule</span>
         </div>
       </div>
+
+      {/* Insert Statistic Modal */}
+      {showStatisticModal && selectedMatch && (
+        <InsertStatisticModal
+          match={selectedMatch}
+          teamOneId={selectedMatch.team_one_id}
+          teamTwoId={selectedMatch.team_two_id}
+          leagueId={selectedMatch.league_id || leagueId}
+          onClose={() => {
+            setShowStatisticModal(false)
+            setSelectedMatch(null)
+          }}
+          onStatisticInserted={() => {
+            setShowStatisticModal(false)
+            setSelectedMatch(null)
+            // Refresh schedule data if needed
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -86,3 +86,21 @@ def getPendingRequest(session: Session, team_id: int, league_id: int):
             RequestLeague.is_accepted.is_(None)
         )
     ).first()
+
+def getSentRequestsForLeague(session: Session, user_id: int):
+    stmt = (
+        select(
+            RequestLeague,
+            Team.name,
+            League.name,
+            User.name,
+            User.surname,
+        )
+        .join(Team, RequestLeague.team_id == Team.team_id)
+        .join(League, RequestLeague.league_id == League.league_id)
+        .join(User, RequestLeague.receiver_id == User.id)
+        .where(RequestLeague.sender_id == user_id)
+    )
+
+    return session.exec(stmt).all()
+

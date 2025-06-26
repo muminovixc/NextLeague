@@ -91,3 +91,11 @@ def getCalendarForLeague(league_id: int, request: Request, session: Session = De
     
     return league_service.getCalendarForLeague(session, league_id)
 
+@router.post("/insertStatisticsAfterMatch")
+def insert_statistics_after_match(request: Request, body: dict, session: Session = Depends(get_session)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    return league_service.insert_statistics_after_match(session, body)
+
+

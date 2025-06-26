@@ -5,6 +5,7 @@ import { getMyLeagues, getAllLeagues, deleteMyLeague } from "../../lib/league"
 import CreateLeagueModal from "./CreateLeagueForm"
 import LeagueCard from "./LeagueCard"
 import RequestModal from "./RequestModal"
+import SentRequestModal from "./SentRequestsModal"
 import { Trophy, Plus, Filter, Calendar, Users, Search, Trash2, X, AlertTriangle, Mail, Loader2 } from "lucide-react"
 
 function sortLeagues(leagues, dateOrder, teamsOrder) {
@@ -74,6 +75,7 @@ export default function LeaguePage() {
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
   const [showRequests, setShowRequests] = useState(false)
+  const [showSentRequests, setShowSentRequests] = useState(false)
 
   const [showModal, setShowModal] = useState(false)
   const [deletingLeagueId, setDeletingLeagueId] = useState(null)
@@ -228,9 +230,7 @@ export default function LeaguePage() {
                   Join Requests
                 </button>
                 <button
-                  onClick={() => {
-                    /* Add your logic here */
-                  }}
+                  onClick={() => setShowSentRequests(true)}
                   className="inline-flex items-center gap-2 bg-[#274d60] hover:bg-[#6ba3be] text-white px-6 py-3 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   <Mail className="w-5 h-5" />
@@ -446,6 +446,9 @@ export default function LeaguePage() {
 
       {/* Request Modal */}
       {showRequests && <RequestModal onClose={() => setShowRequests(false)} />}
+
+      {/* Sent Request Modal */}
+      {showSentRequests && <SentRequestModal onClose={() => setShowSentRequests(false)} />}
     </div>
   )
 }
