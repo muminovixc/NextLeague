@@ -86,7 +86,7 @@ const Sidebar = ()=> {
           </li>
           <li>
             <Link
-              href="/"
+              href="/statistics"
               className="flex items-center gap-3 p-2 rounded hover:bg-[#0e2e2d] transition"
             >
               <BarChart size={18} /> Statistics

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
+import { useEffect } from "react";
 
 const createCheckoutSession = async (priceId) => {
   const res = await fetch("http://localhost:8000/create-checkout-session", {
@@ -17,6 +18,28 @@ const createCheckoutSession = async (priceId) => {
 };
 
 export default function VipCard() {
+
+  const [user, setUser] = useState(null);
+  
+    useEffect(() => {
+      fetch("http://localhost:8000/user-info", {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("you are not logged in");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("User data:", data);
+          setUser(data);
+        })
+        .catch((err) => {
+          console.error("Greška:", err);
+        });
+    }, []);
 
     {/* FUNKCIJA ZA CHECKOUT*/}
     const handleCheckout = async (priceId) => {
@@ -78,6 +101,12 @@ export default function VipCard() {
       priceId: "price_1RPqGOQbnCtu5rm4KrVrLTjM",
     },
   ];
+  const isCurrentPlan = (index) => {
+  if (!user) return false;
+  if (user.user_type_id === 2 && index === 1) return true; 
+  if (user.user_type_id === 3 && index === 2) return true; 
+  return false;
+};
 
   return (
     <div className="min-h-screen">
@@ -105,17 +134,24 @@ export default function VipCard() {
                   </li>
                 ))}
               </ul>
-            <a><button
-                onClick={() => plan.priceId && handleCheckout(plan.priceId)}
-                disabled={!plan.priceId}
-                className={`w-full font-medium py-2 px-4 rounded-md transition ${
-                  plan.priceId
-                    ? "bg-white text-[#031716] hover:bg-gray-200"
-                    : "bg-gray-500 text-white cursor-not-allowed"
-                }`}
-              >
-                {plan.priceId ? `Choose ${plan.title}` : "Default Plan"}
-              </button></a>  
+           
+  <button
+    onClick={() =>
+      plan.priceId &&
+      !isCurrentPlan(index) &&
+      handleCheckout(plan.priceId)
+    }
+    disabled={isCurrentPlan(index)}
+    className={`w-full font-medium py-2 px-4 rounded-md transition ${
+      isCurrentPlan(index)
+        ? "bg-gray-500 text-white cursor-not-allowed"
+        : "bg-white text-[#031716] hover:bg-gray-200"
+    }`}
+  >
+    {isCurrentPlan(index) ? "Your Current Plan" : `Choose ${plan.title}`}
+  </button>
+
+ 
             </div>
           ))}
         </div>

@@ -112,9 +112,9 @@ def getTeamById(db: Session, team_id: int):
         league.dict() if league else None
     ]
 #def getTeamStatistic(db: Session, team_id: int):
-  #  statement = select(Team).where(Team.team_id == team_id)
-  #  results = db.exec(statement)
-  #  return results.first()
+ #   statement = select(Team).where(Team.team_id == team_id)
+   # results = db.exec(statement)
+    #return results.first()
 
 def getTeamMembers(db: Session, team_id: int):
     statement = (

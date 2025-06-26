@@ -76,7 +76,7 @@ export default function SearchBar() {
               >
                 {getIcon(item.type)}
                 <div className="flex flex-col">
-                  <span className="font-medium text-base">{item.name}</span>
+                  <span className="font-medium text-base">{item.name} {item.surname}</span>
                   <span className="text-xs text-gray-400 uppercase tracking-wide">{item.type}</span>
                 </div>
               </li>
