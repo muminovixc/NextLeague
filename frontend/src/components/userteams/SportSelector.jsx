@@ -1,9 +1,9 @@
 export default function SportSelector({ selectedSport, onSportSelect }) {
   const sports = [
-    { id: 'fudbal', name: 'fudbal', displayName: 'Fudbal', icon: '⚽' },
-    { id: 'kosarka', name: 'kosarka', displayName: 'Košarka', icon: '🏀' },
-    { id: 'odbojka', name: 'odbojka', displayName: 'Odbojka', icon: '🏐' },
-    { id: 'rukomet', name: 'rukomet', displayName: 'Rukomet', icon: '🤾' }
+    { id: 'football', name: 'football', displayName: 'Football', icon: '⚽' },
+    { id: 'basketball', name: 'basketball', displayName: 'Basketball', icon: '��' },
+    { id: 'volleyball', name: 'volleyball', displayName: 'Volleyball', icon: '🏐' },
+    { id: 'handball', name: 'handball', displayName: 'Handball', icon: '🤾' }
   ];
 
   return (

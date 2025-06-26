@@ -7,30 +7,7 @@ import TeamCreateForm from "./TeamCreateForm"
 import Search from "./Search"
 import RequestTeamModal from "./RequestTeamModal"
 import { createRequestForTeam } from "../../lib/team"
-import {
-  Users,
-  Trophy,
-  MapPin,
-  Settings,
-  Trash2,
-  Eye,
-  Plus,
-  UserPlus,
-  Hash,
-  ChevronDown,
-  ChevronRight,
-  Zap,
-  Crown,
-  Star,
-  Activity,
-  Target,
-  Sparkles,
-  Shield,
-  Award,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react"
+import { Users, Trophy, MapPin, Settings, Trash2, Eye, Plus, UserPlus, Hash } from "lucide-react"
 
 import { getMyTeam, getTeamMembers, getAllTeams, deleteTeam } from "../../lib/team"
 
@@ -731,33 +708,15 @@ export default function TeamPage() {
                         <Trophy className="w-4 h-4" />
                         Squad ({teamMembers.length} players)
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
-                        {teamMembers.map((member, index) => (
-                          <div
-                            key={member.id}
-                            className="flex items-center p-3 rounded-xl bg-[#032f30] border border-[#0a7075] hover:border-[#0c969c]/50 transition-all duration-300"
-                          >
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 bg-[#0a7075] border border-[#0c969c]/30">
-                              <span className="text-sm font-bold text-[#6ba3be]">
-                                {member.name ? member.name.charAt(0).toUpperCase() : index + 1}
-                              </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-sm text-[#0c969c] truncate">
-                                {member.name || `Player ${index + 1}`}
-                              </p>
-                              <p className="text-xs text-[#6ba3be] truncate">{member.position || "Position TBD"}</p>
-                            </div>
-                          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {teamMembers.map((member, idx) => (
+                          <PlayerCard key={member.id || idx} user={member} sport={selectedTeam?.team_sport} />
                         ))}
                       </div>
                     </div>
-                    <div className="mb-4">
-                      <h4 className="text-lg font-bold mb-3 text-[#0c969c] flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        Formation
-                      </h4>
-                      <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075] w-full aspect-video">
+                    <div className="mb-8">
+                      <h4 className="text-xl font-semibold mb-4 text-[#0c969c]">Field Formation</h4>
+                      <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075]">
                         <FootballFieldVisualization members={teamMembers} />
                       </div>
                     </div>
