@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react';
 import { get_user_teams } from '../../lib/user';
 
 const sportIcons = {
-  fudbal: '⚽',
-  kosarka: '🏀',
-  odbojka: '🏐',
-  rukomet: '🤾',
+  football: '⚽',
+  basketball: '🏀',
+  volleyball: '🏐',
+  handball: '🤾',
 };
 
 const sportMap = {
-  Football: 'fudbal',
-  Basketball: 'kosarka',
-  Volleyball: 'odbojka',
-  Handball: 'rukomet',
+  Football: 'football',
+  Basketball: 'basketball',
+  Volleyball: 'volleyball',
+  Handball: 'handball',
 };
 
 export default function UserTeamsView({ userId, selectedSport }) {

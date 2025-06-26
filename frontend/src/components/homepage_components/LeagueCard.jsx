@@ -2,7 +2,7 @@ import { UserIcon, LockClosedIcon, GlobeAltIcon, UsersIcon } from '@heroicons/re
 import Link from 'next/link';
 const LeagueCard = ({ sport, leagueName, role, teamCount, isPublic, href }) => {
   const sportColor =
-    sport === 'Fudbal'
+    sport === 'Football'
       ? 'bg-blue-600'
       : sport === 'Košarka'
       ? 'bg-red-600'

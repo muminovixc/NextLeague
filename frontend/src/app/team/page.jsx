@@ -8,6 +8,7 @@ import Search from "./Search"
 import RequestTeamModal from "./RequestTeamModal"
 import { createRequestForTeam } from "../../lib/team"
 import { Users, Trophy, MapPin, Settings, Trash2, Eye, Plus, UserPlus, Hash } from "lucide-react"
+import PlayerCard from "../../components/player_card/PlayerCard"
 
 import { getMyTeam, getTeamMembers, getAllTeams, deleteTeam } from "../../lib/team"
 
@@ -431,28 +432,12 @@ export default function TeamPage() {
                       <h4 className="text-xl font-semibold mb-4 text-[#0c969c]">
                         Squad ({teamMembers.length} players)
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {teamMembers.map((member, index) => (
-                          <div
-                            key={member.id}
-                            className="flex items-center p-4 rounded-xl bg-[#032f30] border border-[#0a7075] hover:border-[#0c969c]/50 transition-all duration-300"
-                          >
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-[#0a7075] border border-[#0c969c]/30">
-                              <span className="text-lg font-bold text-[#6ba3be]">
-                                {member.name ? member.name.charAt(0).toUpperCase() : index + 1}
-                              </span>
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-semibold text-lg text-[#0c969c]">
-                                {member.name || `Player ${index + 1}`}
-                              </p>
-                              <p className="text-sm text-[#6ba3be]">{member.position || "No position assigned"}</p>
-                            </div>
-                          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {teamMembers.map((member, idx) => (
+                          <PlayerCard key={member.id || idx} user={member} sport={selectedTeam?.team_sport} />
                         ))}
                       </div>
                     </div>
-
                     <div className="mb-8">
                       <h4 className="text-xl font-semibold mb-4 text-[#0c969c]">Field Formation</h4>
                       <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075]">
