@@ -4,7 +4,7 @@ from sqlalchemy import or_
 from models.team_model import Team
 from models.team_model import TeamStatistic
 from models.user_model import User, UserChart
-from models.league_model import League
+from models.league_model import Calendar, League
 from models.team_members_models import TeamMembers
 
 
@@ -160,3 +160,12 @@ def getTeamsByModeratorAndSport(db: Session, user_id: int, sport: str):
     )
     results = db.exec(statement).all()
     return results
+
+def get_calendar_by_team_id(db: Session, team_id: int):
+    statement = select(Calendar).where(
+        or_(
+            Calendar.team_one_id == team_id,
+            Calendar.team_two_id == team_id
+        )
+    )
+    return db.exec(statement).all()

@@ -61,8 +61,6 @@ class TeamMemberSchema(BaseModel):
     id: int
     name: str
     surname: str
-    profile_picture: Optional[str] = None
-    charts: list = []
 
     class Config:
         from_attributes = True
