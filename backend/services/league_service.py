@@ -141,3 +141,9 @@ def getCalendarForLeague(session: Session, league_id: int):
         return league_repository.getCalendarForLeague(session, league_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+def insert_statistics_after_match(session: Session, data: dict):
+    try:
+        return league_repository.insert_statistics_after_match(session, data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

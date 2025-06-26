@@ -44,3 +44,21 @@ export async function getRequestsForLeague() {
     throw error;
   }
 }
+
+export async function getSentRequestLeague() {
+  try {
+    const res = await fetch(`${API_URL}/request/getSentRequestsForLeague`, {
+      method: "GET",
+      credentials: "include", // šalje cookies (za token)
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch sent requests: ${res.statusText}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching sent league requests:", error);
+    throw error;
+  }
+}

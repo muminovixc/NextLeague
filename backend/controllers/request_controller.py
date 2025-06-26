@@ -51,3 +51,11 @@ def accept_request(body: dict, db: Session = Depends(get_session)):
 def decline_request(body: dict, db: Session = Depends(get_session)):
     request_id = body.get("request_id")
     return request_team_service.decline_request(db, request_id)
+
+@router.get("/getSentRequestsForLeague")
+def getSentRequestsForLeague(request: Request, session: Session = Depends(get_session)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    return request_service.getSentRequestsForLeague(session, token)

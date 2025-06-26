@@ -26,3 +26,15 @@ class RequestTeamExtended(BaseModel):
     sender_name: str
     sender_surname: str
     team_name: str
+
+class RequestSentResponse(BaseModel):
+    id: int
+    team_id: int
+    league_id: int
+    sender_id: int
+    receiver_id: int
+    is_reviewed: bool
+    is_accepted: Optional[bool] = None
+    team_name: str
+    league_name: str
+    receiver_full_name: str

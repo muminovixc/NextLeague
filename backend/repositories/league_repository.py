@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from fastapi import HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session, extract, select
 from models.request_model import RequestLeague
 from models.team_model import Team, TeamStatistic
-from models.league_model import Calendar, League, LeagueStatistic, LeagueTeam,LeagueTeamStatisticsView, StatisticAfterMatch
+from models.league_model import Calendar, League, LeagueStatistic, LeagueTeam,LeagueTeamStatisticsView, ScoredPointInMatch, StatisticAfterMatch
 from schemas.league_schema import AddTeamInLeague, LeagueCreate
 
 def getMyLeagues(db: Session, user_id: int):
@@ -130,12 +130,12 @@ def getCalendarForLeague(session: Session, league_id: int):
             "team_one": {
                 "id": team_one.team_id,
                 "name": team_one.name,
-                "logo": team_one.team_logo,  # ✅ ispravljen naziv
+                "logo": team_one.team_logo,  
             },
             "team_two": {
                 "id": team_two.team_id,
                 "name": team_two.name,
-                "logo": team_two.team_logo,  # ✅ ispravljen naziv
+                "logo": team_two.team_logo, 
             },
         }
 
@@ -155,3 +155,89 @@ def getCalendarForLeague(session: Session, league_id: int):
         calendar_with_data.append(match_data)
 
     return calendar_with_data
+
+
+def insert_statistics_after_match(session: Session, data: dict):
+    winner_id = data.get("winner_id")
+    looser_id = data.get("looser_id")
+
+    # Unos statistike utakmice
+    statistic = StatisticAfterMatch(
+        league_id=int(data["league_id"]),
+        team_one_id=data["team_one_id"],
+        team_two_id=data["team_two_id"],
+        winner_id=winner_id if winner_id != 0 else None,
+        looser_id=looser_id if looser_id != 0 else None,
+        win_points=data.get("win_points"),
+        lose_points=data.get("lose_points"),
+        best_player_id=data.get("best_player_id")
+    )
+    session.add(statistic)
+    session.commit()
+    session.refresh(statistic)
+
+    # Dodaj bodove po igračima
+    scored_points = data.get("scored_points", [])
+    for point in scored_points:
+        scored = ScoredPointInMatch(
+            statistic_after_match_id=statistic.id,
+            player_id=point["player_id"],
+            number_of_points=point["number_of_points"]
+        )
+        session.add(scored)
+
+    # Ažuriranje team_statistic za oba tima
+    def update_team_stat(team_id: int):
+        stat = session.exec(
+            select(TeamStatistic).where(
+                TeamStatistic.team_id == team_id,
+                TeamStatistic.league_id == int(data["league_id"])
+            )
+        ).first()
+
+        if not stat:
+            raise HTTPException(status_code=404, detail=f"TeamStatistic not found for team_id {team_id}")
+
+        stat.number_of_matches_played += 1
+
+        is_winner = (winner_id == team_id)
+        is_loser = (looser_id == team_id)
+        is_draw = winner_id in [0, None]
+
+        if is_winner:
+            stat.number_of_wins += 1
+            stat.points += 3
+        elif is_loser:
+            stat.number_of_losses += 1
+        elif is_draw:
+            stat.number_of_draws += 1
+            stat.points += 1
+
+        # Golovi: pravična raspodjela
+        if is_draw:
+            scored = data.get("win_points") or 0
+            conceded = data.get("win_points") or 0
+        elif is_winner:
+            scored = data.get("win_points") or 0
+            conceded = data.get("lose_points") or 0
+        elif is_loser:
+            scored = data.get("lose_points") or 0
+            conceded = data.get("win_points") or 0
+        else:
+            scored = 0
+            conceded = 0
+
+        stat.win_points += scored
+        stat.lose_points += conceded
+        stat.difference_points += (scored - conceded)
+
+        session.add(stat)
+
+    update_team_stat(data["team_one_id"])
+    update_team_stat(data["team_two_id"])
+
+    session.commit()
+    return {"message": "Statistika, bodovi i timski podaci su uspješno dodani."}
+
+
+

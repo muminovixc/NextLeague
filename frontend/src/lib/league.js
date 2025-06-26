@@ -218,3 +218,30 @@ export async function getCalendarForLeague(leagueId) {
     throw error;
   }
 }
+
+export async function InsertStatisticAfterMatch(data) {
+  try {
+    console.log("PODACI KOJI SE ŠALJU:", data);
+
+    const res = await fetch(`${API_URL}/league/insertStatisticsAfterMatch`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // šalje cookie (token)
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.detail || "Greška prilikom slanja statistike");
+    }
+
+    const responseData = await res.json();
+    console.log("Odgovor servera:", responseData);
+    return responseData;
+  } catch (err) {
+    console.error("Greška:", err.message);
+    throw err;
+  }
+}

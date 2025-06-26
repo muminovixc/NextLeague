@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from schemas.request_schema import RequestLeagueResponse
+from schemas.request_schema import RequestLeagueResponse, RequestSentResponse
 from models.league_model import League
 from repositories import request_repository
 from models.request_model import RequestLeague
@@ -65,6 +65,36 @@ def getRequestsForLeague(session: Session, token: str):
                 team_name=team_name,
                 league_name=league_name,
                 sender_full_name=f"{sender_name} {sender_surname}"
+            ))
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def getSentRequestsForLeague(session: Session, token: str):
+    try:
+        payload = decode_access_token(token)
+        user_id = payload.get("id")
+        if not user_id:
+            raise Exception("User ID not found in token.")
+
+        raw_results = request_repository.getSentRequestsForLeague(session, user_id)
+
+        response = []
+        for request, team_name, league_name, receiver_name, receiver_surname in raw_results:
+            response.append(RequestSentResponse(
+                id=request.id,
+                team_id=request.team_id,
+                league_id=request.league_id,
+                sender_id=request.sender_id,
+                receiver_id=request.receiver_id,
+                is_reviewed=request.is_reviewed,
+                is_accepted=request.is_accepted,
+                team_name=team_name,
+                league_name=league_name,
+                receiver_full_name=f"{receiver_name} {receiver_surname}"
             ))
 
         return response
