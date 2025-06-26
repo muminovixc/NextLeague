@@ -13,6 +13,7 @@ class UserResponse(BaseModel):
     email: str
     phone_number: str
     user_type_id: int
+    birth_date: Optional[date] = None  # <-- OVO DODAJ
 
     class Config:
         from_attributes = True
