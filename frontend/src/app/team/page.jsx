@@ -6,8 +6,25 @@ import FootballFieldVisualization from "./FootballFieldVisualization"
 import TeamCreateForm from "./TeamCreateForm"
 import Search from "./Search"
 import RequestTeamModal from "./RequestTeamModal"
+import TeamCardGrid from "./TeamCardGrid"
+import AllTeamsGrid from "./AllTeamsGrid"
 import { createRequestForTeam } from "../../lib/team"
-import { Users, Trophy, MapPin, Settings, Trash2, Eye, Plus, UserPlus, Hash } from "lucide-react"
+import {
+  Users,
+  Trophy,
+  Settings,
+  Plus,
+  ChevronDown,
+  ChevronRight,
+  Zap,
+  Crown,
+  Activity,
+  Target,
+  Sparkles,
+  Shield,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react"
 
 import { getMyTeam, getTeamMembers, getAllTeams, deleteTeam } from "../../lib/team"
 
@@ -27,7 +44,7 @@ export default function TeamPage() {
   const [showRequestsModal, setShowRequestsModal] = useState(false)
   const [processingRequests, setProcessingRequests] = useState(new Set())
   const [deletingTeams, setDeletingTeams] = useState(new Set())
-  const [notification, setNotification] = useState(null) // { type: 'success'|'error', message: string }
+  const [notification, setNotification] = useState(null)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredTeams, setFilteredTeams] = useState([])
@@ -107,7 +124,6 @@ export default function TeamPage() {
   const handleDeleteTeam = async (teamId) => {
     if (deletingTeams.has(teamId)) return
 
-    // Show confirmation
     if (!confirm("Are you sure you want to delete this team? This action cannot be undone.")) {
       return
     }
@@ -213,7 +229,6 @@ export default function TeamPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#031716] relative overflow-hidden">
-        {/* Animated background elements */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-[#0c969c]/10 animate-pulse"></div>
           <div className="absolute top-3/4 right-1/4 w-24 h-24 rounded-full bg-[#6ba3be]/10 animate-pulse delay-300"></div>
@@ -242,7 +257,6 @@ export default function TeamPage() {
 
   return (
     <div className="min-h-screen py-8 bg-[#031716] relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 right-20 w-40 h-40 rounded-full bg-gradient-to-br from-[#0c969c]/5 to-[#6ba3be]/5 animate-pulse"></div>
         <div className="absolute bottom-20 left-20 w-32 h-32 rounded-full bg-gradient-to-br from-[#274d60]/5 to-[#0a7075]/5 animate-pulse delay-1000"></div>
@@ -425,113 +439,14 @@ export default function TeamPage() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {myTeams.map((team, index) => (
-                    <div
-                      key={team.team_id}
-                      className="group relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 hover:scale-[1.03] hover:shadow-3xl bg-gradient-to-br from-[#032f30] to-[#0a7075]/50 border border-[#0a7075] hover:border-[#0c969c] animate-in slide-in-from-bottom-5 duration-500"
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      {/* Animated gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#0c969c]/10 via-[#6ba3be]/5 to-[#274d60]/10 opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-
-                      {/* Moderator crown indicator */}
-                      {team.moderator_user_id === currentUser && (
-                        <div className="absolute top-4 right-4 z-20">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg animate-pulse">
-                            <Crown className="w-4 h-4 text-white" />
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="relative p-8 z-10">
-                        {/* Header */}
-                        <div className="flex items-start justify-between mb-8">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-4">
-                              <Star className="w-6 h-6 text-[#0c969c] group-hover:text-[#6ba3be] transition-colors duration-300" />
-                              <h3 className="text-2xl font-bold text-[#0c969c] group-hover:text-[#6ba3be] transition-colors duration-300">
-                                {team.name}
-                              </h3>
-                            </div>
-
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-[#0a7075] to-[#274d60] text-[#6ba3be] border border-[#0c969c]/30 shadow-lg">
-                                <Trophy className="w-4 h-4" />
-                                {team.team_sport}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center text-sm text-[#6ba3be] mb-4">
-                              <MapPin className="w-5 h-5 mr-2 text-[#0c969c] group-hover:text-[#6ba3be] transition-colors duration-300" />
-                              {team.country}
-                            </div>
-                          </div>
-
-                          {team.team_logo && (
-                            <div className="w-20 h-20 rounded-2xl flex items-center justify-center ml-4 bg-gradient-to-br from-[#0a7075] to-[#274d60] border-2 border-[#0c969c]/30 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                              <img
-                                src={`http://localhost:8000/${team.team_logo.replace(/^\/+/, "")}`}
-                                alt={`${team.name} logo`}
-                                style={{
-                                  width: "60px",
-                                  height: "60px",
-                                  objectFit: "cover",
-                                  borderRadius: "50%",
-                                  border: "2px solid white",
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Team ID */}
-                        <div className="mb-8 p-4 rounded-xl bg-gradient-to-r from-[#031716] to-[#032f30] border border-[#0a7075] group-hover:border-[#0c969c]/50 transition-all duration-300">
-                          <div className="flex items-center text-sm font-mono text-[#6ba3be]">
-                            <Hash className="w-4 h-4 mr-2 text-[#0c969c]" />
-                            <span className="text-[#6ba3be]">ID:</span>
-                            <span className="text-[#0c969c] ml-2 font-bold">{team.team_id}</span>
-                          </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-4">
-                          <button
-                            onClick={() => handleViewMembers(team)}
-                            className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-[#274d60] to-[#0a7075] text-[#6ba3be] hover:from-[#0a7075] hover:to-[#0c969c] border border-[#0a7075] hover:border-[#0c969c] group/btn"
-                          >
-                            <Users className="w-5 h-5 group-hover/btn:animate-pulse" />
-                            View Squad
-                          </button>
-
-                          <button
-                            onClick={() => handleViewTeam(team.team_id)}
-                            className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-[#0c969c] to-[#6ba3be] text-[#031716] hover:from-[#6ba3be] hover:to-[#0c969c] group/btn relative overflow-hidden"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                            <Target className="w-5 h-5 relative z-10 group-hover/btn:animate-pulse" />
-                            <span className="relative z-10">View Statistics</span>
-                          </button>
-
-                          {team.moderator_user_id === currentUser && (
-                            <button
-                              onClick={() => handleDeleteTeam(team.team_id)}
-                              disabled={deletingTeams.has(team.team_id)}
-                              className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600 disabled:from-red-600/50 disabled:to-red-700/50 disabled:cursor-not-allowed disabled:scale-100 group/btn"
-                            >
-                              {deletingTeams.has(team.team_id) ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                              ) : (
-                                <Trash2 className="w-5 h-5 group-hover/btn:animate-pulse" />
-                              )}
-                              {deletingTeams.has(team.team_id) ? "Deleting..." : "Delete Team"}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <TeamCardGrid
+                  teams={myTeams}
+                  currentUser={currentUser}
+                  onViewMembers={handleViewMembers}
+                  onViewTeam={handleViewTeam}
+                  onDeleteTeam={handleDeleteTeam}
+                  deletingTeams={deletingTeams}
+                />
               )}
             </div>
           )}
@@ -559,110 +474,16 @@ export default function TeamPage() {
 
         {showAllTeams && (
           <div className="animate-in slide-in-from-top-5 duration-500">
-            {(searchQuery ? filteredTeams : allTeams).length === 0 ? (
-              <div className="text-center py-20 rounded-3xl bg-gradient-to-br from-[#032f30] to-[#0a7075]/30 border border-[#0a7075]">
-                <div className="w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center bg-gradient-to-br from-[#0a7075] to-[#274d60] shadow-2xl">
-                  <Trophy className="w-16 h-16 text-[#6ba3be] animate-pulse" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-[#0c969c]">No Teams Found</h3>
-                <p className="text-lg text-[#6ba3be]">
-                  {searchQuery ? "Try adjusting your search criteria" : "Be the first to create a team!"}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {(searchQuery ? filteredTeams : allTeams).map((team, index) => (
-                  <div
-                    key={team.team_id}
-                    className="group relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 hover:scale-[1.03] hover:shadow-3xl bg-gradient-to-br from-[#032f30] to-[#0a7075]/30 border border-[#0a7075] hover:border-[#6ba3be] animate-in slide-in-from-bottom-5 duration-500"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#6ba3be]/5 via-[#0c969c]/5 to-[#274d60]/10 opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-
-                    <div className="relative p-8 z-10">
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-8">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-4">
-                            <Award className="w-6 h-6 text-[#6ba3be] group-hover:text-[#0c969c] transition-colors duration-300" />
-                            <h3 className="text-2xl font-bold text-[#0c969c] group-hover:text-[#6ba3be] transition-colors duration-300">
-                              {team.name}
-                            </h3>
-                          </div>
-
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-[#0a7075] to-[#274d60] text-[#6ba3be] border border-[#6ba3be]/30 shadow-lg">
-                              <Trophy className="w-4 h-4" />
-                              {team.team_sport}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center text-sm text-[#6ba3be] mb-4">
-                            <MapPin className="w-5 h-5 mr-2 text-[#6ba3be] group-hover:text-[#0c969c] transition-colors duration-300" />
-                            {team.country}
-                          </div>
-                        </div>
-
-                        {team.team_logo && (
-                          <div className="w-20 h-20 rounded-2xl flex items-center justify-center ml-4 bg-gradient-to-br from-[#0a7075] to-[#274d60] border-2 border-[#6ba3be]/30 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                            <img
-                              src={`http://localhost:8000/${team.team_logo.replace(/^\/+/, "")}`}
-                              alt={`${team.name} logo`}
-                              style={{
-                                width: "60px",
-                                height: "60px",
-                                objectFit: "cover",
-                                borderRadius: "50%",
-                                border: "2px solid white",
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Team ID */}
-                      <div className="mb-8 p-4 rounded-xl bg-gradient-to-r from-[#031716] to-[#032f30] border border-[#0a7075] group-hover:border-[#6ba3be]/50 transition-all duration-300">
-                        <div className="flex items-center text-sm font-mono text-[#6ba3be]">
-                          <Hash className="w-4 h-4 mr-2 text-[#6ba3be]" />
-                          <span className="text-[#6ba3be]">ID:</span>
-                          <span className="text-[#0c969c] ml-2 font-bold">{team.team_id}</span>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="space-y-4">
-                        <button
-                          onClick={() => handleViewTeam(team.team_id)}
-                          className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-[#274d60] to-[#0a7075] text-[#6ba3be] hover:from-[#0a7075] hover:to-[#6ba3be] border border-[#0a7075] hover:border-[#6ba3be] group/btn"
-                        >
-                          <Eye className="w-5 h-5 group-hover/btn:animate-pulse" />
-                          Explore Team
-                        </button>
-
-                        {team.moderator_user_id !== currentUser && !myTeams.some((t) => t.team_id === team.team_id) && (
-                          <button
-                            onClick={() => handleJoinTeamRequest(team.team_id)}
-                            disabled={processingRequests.has(team.team_id)}
-                            className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-[#0c969c] to-[#6ba3be] text-[#031716] hover:from-[#6ba3be] hover:to-[#0c969c] disabled:from-[#0c969c]/50 disabled:to-[#6ba3be]/50 disabled:cursor-not-allowed disabled:scale-100 group/btn relative overflow-hidden"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                            {processingRequests.has(team.team_id) ? (
-                              <Loader2 className="w-5 h-5 relative z-10 animate-spin" />
-                            ) : (
-                              <UserPlus className="w-5 h-5 relative z-10 group-hover/btn:animate-pulse" />
-                            )}
-                            <span className="relative z-10">
-                              {processingRequests.has(team.team_id) ? "Sending..." : "Join Team"}
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <AllTeamsGrid
+              allTeams={allTeams}
+              myTeams={myTeams}
+              currentUser={currentUser}
+              searchQuery={searchQuery}
+              filteredTeams={filteredTeams}
+              onJoinRequest={handleJoinTeamRequest}
+              processingRequests={processingRequests}
+              onViewTeam={handleViewTeam}
+            />
           </div>
         )}
 
@@ -670,7 +491,7 @@ export default function TeamPage() {
         {showRequestsModal && <RequestTeamModal onClose={() => setShowRequestsModal(false)} />}
         {showCreateForm && <TeamCreateForm onClose={handleCloseCreateForm} onTeamCreated={handleTeamCreated} />}
 
-        {/* Team Members Modal */}
+        {/* Team Members Modal - ORIGINAL STYLE WITHOUT PLAYER CARDS */}
         {showMembers && selectedTeam && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-md">
             <div className="rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto bg-gradient-to-br from-[#031716] to-[#032f30] border border-[#0c969c]">
@@ -708,15 +529,33 @@ export default function TeamPage() {
                         <Trophy className="w-4 h-4" />
                         Squad ({teamMembers.length} players)
                       </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {teamMembers.map((member, idx) => (
-                          <PlayerCard key={member.id || idx} user={member} sport={selectedTeam?.team_sport} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
+                        {teamMembers.map((member, index) => (
+                          <div
+                            key={member.id}
+                            className="flex items-center p-3 rounded-xl bg-[#032f30] border border-[#0a7075] hover:border-[#0c969c]/50 transition-all duration-300"
+                          >
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 bg-[#0a7075] border border-[#0c969c]/30">
+                              <span className="text-sm font-bold text-[#6ba3be]">
+                                {member.name ? member.name.charAt(0).toUpperCase() : index + 1}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm text-[#0c969c] truncate">
+                                {member.name || `Player ${index + 1}`}
+                              </p>
+                              <p className="text-xs text-[#6ba3be] truncate">{member.position || "Position TBD"}</p>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
-                    <div className="mb-8">
-                      <h4 className="text-xl font-semibold mb-4 text-[#0c969c]">Field Formation</h4>
-                      <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075]">
+                    <div className="mb-4">
+                      <h4 className="text-lg font-bold mb-3 text-[#0c969c] flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Formation
+                      </h4>
+                      <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075] w-full aspect-video">
                         <FootballFieldVisualization members={teamMembers} />
                       </div>
                     </div>
