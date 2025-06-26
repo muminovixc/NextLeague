@@ -18,12 +18,12 @@ export default function Home() {
       The all-in-one platform for league organizers and club managers.
     </p>
     <div className="flex flex-col sm:flex-row gap-4">
-      <button className="bg-[#0c969c] text-white px-8 py-3 rounded-lg hover:bg-[#0a7075] shadow-md transition">
+    <Link href="/homepage">  <button className="bg-[#0c969c] text-white px-8 py-3 rounded-lg hover:bg-[#0a7075] shadow-md transition">
         Start Your League
-      </button>
-      <button className="border border-[#0c969c] text-white px-8 py-3 rounded-lg hover:bg-[#032f30] shadow-md transition">
+      </button></Link>
+     <Link href="/homepage"> <button className="border border-[#0c969c] text-white px-8 py-3 rounded-lg hover:bg-[#032f30] shadow-md transition">
         Explore Features
-      </button>
+      </button></Link>
     </div>
   </div>
 

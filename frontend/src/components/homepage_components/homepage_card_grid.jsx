@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { TrophyIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/outline';
 import Card from './homepage_card';
+import Link from 'next/link';
 
 const CardsGrid = () => {
   const [cards, setCards] = useState([]);
@@ -31,16 +32,16 @@ const CardsGrid = () => {
 
 return (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6">
-     <a href="/league" className="block"><Card
+    <Link href="/league" className="block"><Card
       icon={TrophyIcon}
       title="Number of leagues"
       number={cards.leagues || "No leagues found"}  
-    /></a>
-   <a href="/team" className="block"> <Card
+    /></Link>
+   <Link href="/team" className="block"> <Card
       icon={UsersIcon}
       title="Number of teams"
       number={cards.teams || "No teams found"} 
-    /></a> 
+    /></Link>
   </div>
 );
 };

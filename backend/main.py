@@ -13,8 +13,9 @@ from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from fastapi import Request
 from controllers.vip_controller import router as vip_router
+from controllers.statistic_controller import router as statistics_router
 
-app = FastAPI()
+app = FastAPI() 
 
 # Dodavanje CORS middleware-a
 app.add_middleware(
@@ -25,10 +26,11 @@ app.add_middleware(
     allow_headers=["*"],  # dozvoljava sva zaglavlja
 )
 print("FastAPI app se pokrenula")
-
+ 
  
 app.include_router(auth_router)
 app.include_router(league_router)  
 app.include_router(team_router)  
 app.include_router(homepage_router)
 app.include_router(vip_router)   
+app.include_router(statistics_router)

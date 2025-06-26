@@ -134,7 +134,7 @@ export default function VipCard() {
                   </li>
                 ))}
               </ul>
-           <a>
+           
   <button
     onClick={() =>
       plan.priceId &&
@@ -150,7 +150,7 @@ export default function VipCard() {
   >
     {isCurrentPlan(index) ? "Your Current Plan" : `Choose ${plan.title}`}
   </button>
-</a>
+
  
             </div>
           ))}
