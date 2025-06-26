@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import List
+from typing import Optional
 
 class PlayerInfo(BaseModel):
     id: int
@@ -16,7 +17,7 @@ class TeamPlayersResponse(BaseModel):
 
 class TeamStatResponse(BaseModel):
     team_id: int
-    league_id: int
+    league_id: Optional[int] = None
     number_of_matches_played: int
     number_of_wins: int
     number_of_draws: int
