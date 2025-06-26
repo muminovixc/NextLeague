@@ -11,3 +11,4 @@ npm install @mui/icons-material
 
 
 # za pokretanje je :  uvicorn backend.main:app --reload
+npm install recharts
