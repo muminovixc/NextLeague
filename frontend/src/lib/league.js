@@ -135,7 +135,86 @@ export async function getLeagueById(league_id){
 
 }
 
-export async function sendRequestForLeague(team_id) {
-  
+export async function sendRequestForLeague(team_id, league_id) {
+  console.log("OVOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+  console.log("OVOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+
+  console.log(team_id);
+  console.log(league_id);
 }
 
+export async function addTeamInLeague(data) {
+  
+  const res = await fetch(`${API_URL}/league/addTeamInLeague`, {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || "Failed to add team in league");
+  }
+
+  return await res.json();
+}
+
+
+export async function getUserId() {
+  try {
+    const res = await fetch(`${API_URL}/league/getUserId`, {
+      credentials: 'include', // bitno za cookie
+    });
+    if (!res.ok) throw new Error("Failed to fetch user ID");
+    const data = await res.json();
+    return data.user_id;
+  } catch (err) {
+    console.error("getUserId error:", err);
+    return null;
+  }
+}
+
+export async function startLeague(leagueId) {
+  try {
+    const res = await fetch(`${API_URL}/league/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ league_id: leagueId }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to start league");
+    }
+
+    const data = await res.json();
+    console.log("League started:", data);
+  } catch (error) {
+    console.error("Error starting league:", error);
+    throw error;
+  }
+};
+
+export async function getCalendarForLeague(leagueId) {
+  try {
+    const res = await fetch(`${API_URL}/league/getCalendarForLeague/${leagueId}`, {
+      method: 'GET',
+      credentials: 'include', // da pošalje cookies (token)
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch calendar for league: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching league calendar:", error);
+    throw error;
+  }
+}

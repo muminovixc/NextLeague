@@ -32,7 +32,7 @@ const CardsGrid = () => {
 
 return (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6">
-    <Link href="/league" className="block"><Card
+     <Link href="/league" className="block"><Card
       icon={TrophyIcon}
       title="Number of leagues"
       number={cards.leagues || "No leagues found"}  
@@ -41,7 +41,7 @@ return (
       icon={UsersIcon}
       title="Number of teams"
       number={cards.teams || "No teams found"} 
-    /></Link>
+    /></Link> 
   </div>
 );
 };

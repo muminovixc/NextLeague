@@ -80,3 +80,17 @@ def deleteTeam(team_id: int, request: Request, session: Session = Depends(get_db
         raise HTTPException(status_code=401, detail="User not authenticated")
     
     return team_service.deleteTeam(session, team_id, token)
+
+
+@router.get("/getMyTeamsModeratorFiltered")
+def getMyTeamsModeratorFiltered(league_sport: str, request: Request, session: Session = Depends(get_db)):
+    token = request.cookies.get('access_token')
+
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+
+    return team_service.getMyTeamsModeratorFiltered(session, token, league_sport)
+
+@router.get("/calendar/team/{team_id}")
+def get_calendar_for_team(team_id: int, session: Session = Depends(get_db)):
+    return team_service.get_calendar_for_team(session, team_id)

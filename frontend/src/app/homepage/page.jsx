@@ -13,7 +13,7 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8000/user-info", {
+    fetch("http://localhost:8000/user/my_profile", {
       method: "GET",
       credentials: "include",
     })
@@ -86,8 +86,7 @@ export default function HomePage() {
           <div className="w-full md:w-1/2 p-4 bg-[#0a7075] rounded lg:ml-4 mt-4 md:mt-0">
             <div className="flex justify-between items-center mt-5 px-5 pb-5">
               <p className="text-3xl font-semibold text-white">Your teams</p>
-              <Link href="/team" className="text-blue-400 hover:underline">view all leagues</Link>
-
+              <Link href="/team" className="text-blue-400 hover:underline">view all teams</Link>
             </div>
             <TeamsGrid />
           </div>

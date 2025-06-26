@@ -3,6 +3,7 @@ from datetime import date
 from typing import Literal
 from typing import Optional
 from typing import List
+from typing import Optional
 
 class UserResponse(BaseModel):
     id: int

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import LeagueCard from './LeagueCard';
+import Link from 'next/link';
 
 const LeaguesGrid = () => {
   const [leagues, setLeagues] = useState([]);
@@ -17,7 +18,7 @@ const LeaguesGrid = () => {
      <div className="flex flex-wrap w-full">
     {leagues.slice(0, 2).map((league) => (
       <div className="w-full md:w-1/2 p-4" key={league.league_id}>
-        <a href={`/league/view/${league.league_id}`} >
+        <Link href={`/league/view/${league.league_id}`} > {/* koristiti Link*/}
       <LeagueCard
         href={`/league/view/${league.league_id}`}
         sport={league.sport}
@@ -26,7 +27,7 @@ const LeaguesGrid = () => {
         teamCount={league.number_of_teams}
         isPublic={league.access === "PUBLIC"}
       /> 
-    </a>
+    </Link>
       </div>
     ))}
   </div>

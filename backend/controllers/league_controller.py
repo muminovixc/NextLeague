@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, Request,HTTPException
+from fastapi.responses import JSONResponse
 from sqlmodel import Session
+from auth.jwt_utils import decode_access_token
 from services import league_service
 from models.league_model import League
-from schemas.league_schema import TeamStatisticOut, LeagueCreate
+from schemas.league_schema import AddTeamInLeague, StartLeagueRequest, TeamStatisticOut, LeagueCreate
 from database.database import engine
 
 def get_session():
@@ -53,3 +55,39 @@ def getLeagueById(league_id: int, request: Request, session: Session = Depends(g
     if not token:
         raise HTTPException(status_code=401, detail="User not authenticated")
     return league_service.getLeagueById(session,token,league_id)
+
+
+@router.post("/addTeamInLeague")
+def addTeamInLeague(data: AddTeamInLeague, request: Request, session: Session = Depends(get_session)):
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    return league_service.addTeamInLeague(session, token, data)
+
+@router.post("/start")
+def start_league(data: StartLeagueRequest, request: Request, session: Session = Depends(get_session)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    return league_service.start_league(session, token, data.league_id)
+
+@router.get("/getUserId")
+def get_user_id(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return JSONResponse(status_code=401, content={"detail": "Token missing"})
+
+    payload = decode_access_token(token)
+    if not payload:
+        return JSONResponse(status_code=401, content={"detail": "Invalid token"})
+
+    return {"user_id": payload.get("id")}
+
+@router.get("/getCalendarForLeague/{league_id}")
+def getCalendarForLeague(league_id: int, request: Request, session: Session = Depends(get_session)):
+    token = request.cookies.get('access_token')
+    if not token:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    
+    return league_service.getCalendarForLeague(session, league_id)
+
