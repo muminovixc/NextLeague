@@ -11,7 +11,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedSport, setSelectedSport] = useState("fudbal");
+  const [selectedSport, setSelectedSport] = useState("football");
   const [chartData, setChartData] = useState({
     napad: 16,
     odbrana: 16,
@@ -43,6 +43,7 @@ export default function ProfilePage() {
       try {
         const data = await get_my_profile();
         setUser(data);
+        const chart = data.charts?.find(chart => chart.sport === (data.sport || selectedSport));
         setFormData({
           name: data.name || "",
           surname: data.surname || "",
@@ -51,12 +52,12 @@ export default function ProfilePage() {
           password: "",
           confirmPassword: "",
           sport: data.sport || "",
-          napad: data.napad || "",
-          odbrana: data.odbrana || "",
-          dodavanja: data.dodavanja || "",
-          izdrzljivost: data.izdrzljivost || "",
-          snaga: data.snaga || "",
-          brzina: data.brzina || ""
+          napad: chart?.napad ?? "",
+          odbrana: chart?.odbrana ?? "",
+          dodavanja: chart?.dodavanja ?? "",
+          izdrzljivost: chart?.izdrzljivost ?? "",
+          snaga: chart?.snaga ?? "",
+          brzina: chart?.brzina ?? ""
         });
         updateChartData(data, selectedSport);
       } catch (err) {
@@ -95,6 +96,18 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       updateChartData(user, selectedSport);
+      // Update form fields for stats as well when sport changes
+      const chart = user.charts?.find(chart => chart.sport === selectedSport);
+      setFormData(prev => ({
+        ...prev,
+        napad: chart?.napad ?? "",
+        odbrana: chart?.odbrana ?? "",
+        dodavanja: chart?.dodavanja ?? "",
+        izdrzljivost: chart?.izdrzljivost ?? "",
+        snaga: chart?.snaga ?? "",
+        brzina: chart?.brzina ?? "",
+        sport: selectedSport
+      }));
     }
   }, [selectedSport, user]);
 
@@ -104,6 +117,24 @@ export default function ProfilePage() {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleSportChange = (e) => {
+    const newSport = e.target.value;
+    setSelectedSport(newSport);
+    if (user) {
+      const chart = user.charts?.find(chart => chart.sport.toLowerCase() === newSport.toLowerCase());
+      setFormData(prev => ({
+        ...prev,
+        sport: newSport,
+        napad: chart?.napad ?? "",
+        odbrana: chart?.odbrana ?? "",
+        dodavanja: chart?.dodavanja ?? "",
+        izdrzljivost: chart?.izdrzljivost ?? "",
+        snaga: chart?.snaga ?? "",
+        brzina: chart?.brzina ?? ""
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -193,13 +224,13 @@ export default function ProfilePage() {
                   <div className="flex justify-center mb-6">
                     <select
                       value={selectedSport}
-                      onChange={(e) => setSelectedSport(e.target.value)}
+                      onChange={handleSportChange}
                       className="px-4 py-2 rounded bg-[#032f30] text-white border border-[#0c969c]/30"
                     >
-                      <option value="fudbal">Fudbal</option>
-                      <option value="kosarka">Košarka</option>
-                      <option value="rukomet">Rukomet</option>
-                      <option value="odbojka">Odbojka</option>
+                      <option value="football">Football</option>
+                      <option value="basketball">Basketball</option>
+                      <option value="handball">Handball</option>
+                      <option value="volleyball">Volleyball</option>
                     </select>
                   </div>
                   
@@ -286,16 +317,14 @@ export default function ProfilePage() {
                   />
                   <div className="flex justify-center">
                     <select
-                      name="sport"
-                      value={formData.sport || ""}
-                      onChange={handleInputChange}
-                      className="px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
+                      value={formData.sport}
+                      onChange={handleSportChange}
+                      className="px-4 py-2 rounded bg-[#032f30] text-white border border-[#0c969c]/30"
                     >
-                      <option value="">Odaberi sport</option>
-                      <option value="kosarka">Košarka</option>
-                      <option value="fudbal">Fudbal</option>
-                      <option value="odbojka">Odbojka</option>
-                      <option value="rukomet">Rukomet</option>
+                      <option value="football">Football</option>
+                      <option value="basketball">Basketball</option>
+                      <option value="handball">Handball</option>
+                      <option value="volleyball">Volleyball</option>
                     </select>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -307,6 +336,8 @@ export default function ProfilePage() {
                         value={formData.napad || ""}
                         onChange={handleInputChange}
                         placeholder="ATK"
+                        min={1}
+                        max={20}
                         className="w-full px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
                       />
                     </div>
@@ -318,6 +349,8 @@ export default function ProfilePage() {
                         value={formData.odbrana || ""}
                         onChange={handleInputChange}
                         placeholder="DEF"
+                        min={1}
+                        max={20}
                         className="w-full px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
                       />
                     </div>
@@ -331,6 +364,8 @@ export default function ProfilePage() {
                         value={formData.dodavanja || ""}
                         onChange={handleInputChange}
                         placeholder="AST"
+                        min={1}
+                        max={20}
                         className="w-full px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
                       />
                     </div>
@@ -342,6 +377,8 @@ export default function ProfilePage() {
                         value={formData.izdrzljivost || ""}
                         onChange={handleInputChange}
                         placeholder="STA"
+                        min={1}
+                        max={20}
                         className="w-full px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
                       />
                     </div>
@@ -355,6 +392,8 @@ export default function ProfilePage() {
                         value={formData.snaga || ""}
                         onChange={handleInputChange}
                         placeholder="POW"
+                        min={1}
+                        max={20}
                         className="w-full px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
                       />
                     </div>
@@ -366,6 +405,8 @@ export default function ProfilePage() {
                         value={formData.brzina || ""}
                         onChange={handleInputChange}
                         placeholder="SPE"
+                        min={1}
+                        max={20}
                         className="w-full px-4 py-2 rounded bg-[#031716] text-white border border-[#0c969c]/30"
                       />
                     </div>

@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react';
 import { getMyTeam } from '../../lib/team';
 
 const sportIcons = {
-  fudbal: '⚽',
-  kosarka: '🏀',
-  odbojka: '🏐',
-  rukomet: '🤾',
+  football: '⚽',
+  basketball: '🏀',
+  volleyball: '🏐',
+  handball: '🤾',
 };
 
 const sportMap = {
-  Football: 'fudbal',
-  Basketball: 'kosarka',
-  Volleyball: 'odbojka',
-  Handball: 'rukomet',
+  Football: 'football',
+  Basketball: 'basketball',
+  Volleyball: 'volleyball',
+  Handball: 'handball',
 };
 
 export default function UserTeams({ selectedSport }) {
