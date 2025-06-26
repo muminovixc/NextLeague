@@ -31,6 +31,7 @@ print("FastAPI app se pokrenula")
 
 # Serve profile pictures statically
 app.mount("/users/profile_pictures", StaticFiles(directory="users/profile_pictures"), name="profile_pictures")
+app.mount("/images/team", StaticFiles(directory="images/team"), name="team_images")
 
 # Include routers
 

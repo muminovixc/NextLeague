@@ -1,6 +1,9 @@
 from sqlmodel import Session, select
+from fastapi import UploadFile, File
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
+import os
+import shutil
 
 from models.team_model import Team
 from models.team_model import TeamStatistic
@@ -30,19 +33,44 @@ def getMyTeams(db: Session, user_id: int):
     return results.all()
 
 
-def createTeam(db: Session, team: Team, user_id: int):
+def createTeam(
+   db: Session,
+    user_id: int,
+    name: str,
+    team_sport: str,
+    country: str,
+    team_identification: Optional[str],
+    team_logo: Optional[UploadFile]
+):
     try:
+        logo_path = None
+        if team_logo:
+            folder_path = "images/team"
+            os.makedirs(folder_path, exist_ok=True)
+            filename = f"{name.lower().replace(' ', '_')}_{team_logo.filename}"
+            full_path = os.path.join(folder_path, filename)
+            with open(full_path, "wb") as buffer:
+                shutil.copyfileobj(team_logo.file, buffer)
+            logo_path = f"/images/team/{filename}"
+
+        team = Team(
+            name=name,
+            team_sport=team_sport,
+            country=country,
+            team_identification=team_identification,
+            team_logo=logo_path,
+            moderator_user_id=user_id
+        )
+
         db.add(team)
         db.commit()
         db.refresh(team)
 
-        member = TeamMembers(user_id=user_id, team_id=team.team_id)
-        db.add(member)
-
-        statistic = TeamStatistic(
+        db.add(TeamMembers(user_id=user_id, team_id=team.team_id))
+        db.add(TeamStatistic(
             moderator_user_id=user_id,
             team_id=team.team_id,
-            league_id=None,  
+            league_id=None,
             number_of_matches_played=0,
             number_of_wins=0,
             number_of_draws=0,
@@ -51,11 +79,8 @@ def createTeam(db: Session, team: Team, user_id: int):
             lose_points=0,
             difference_points=0,
             points=0
-        )
-        db.add(statistic)
-
+        ))
         db.commit()
-
         return team
 
     except Exception as e:

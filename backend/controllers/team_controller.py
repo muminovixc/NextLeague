@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form
 from sqlmodel import Session
+from typing import Optional
 from typing import List
 from services import team_service
 from models.team_members_models import TeamMembers
@@ -8,7 +9,7 @@ from models.user_model import User
 from schemas.team_schema import TeamStatisticOut
 from schemas.team_schema import TeamMemberSchema
 from database.database import engine
-
+import os
 
 
 
@@ -17,6 +18,9 @@ def get_db():
         yield db
 router = APIRouter(prefix="/team", tags=["teams"])
 
+
+static_folder = "images/team"
+os.makedirs(static_folder, exist_ok=True)
 
 
 @router.get("/getMyTeams")
@@ -63,14 +67,31 @@ def getTeamById(team_id: int, request: Request, session: Session = Depends(get_d
     
     return team_service.getTeamById(session, team_id)
 
-@router.post("/createTeam")
-def createTeam(team: Team, request: Request, session: Session = Depends(get_db)):
-    token = request.cookies.get('access_token')
 
+@router.post("/createTeam")
+def create_team(
+    name: str = Form(...),
+    team_sport: str = Form(...),
+    country: str = Form(...),
+    team_identification: Optional[str] = Form(None),
+    team_logo: Optional[UploadFile] = File(None),
+    request: Request = None,
+    session: Session = Depends(get_db)
+):
+    token = request.cookies.get('access_token')
     if not token:
         raise HTTPException(status_code=401, detail="User not authenticated")
-    
-    return team_service.createTeam(session, team, token)
+
+    return team_service.create_team_with_logo(
+        db=session,
+        token=token,
+        name=name,
+        team_sport=team_sport,
+        country=country,
+        team_identification=team_identification,
+        team_logo=team_logo
+    )
+
 
 @router.delete("/deleteMyTeam/{team_id}")
 def deleteTeam(team_id: int, request: Request, session: Session = Depends(get_db)):

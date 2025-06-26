@@ -27,6 +27,9 @@ import {
   Sparkles,
   Shield,
   Award,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react"
 
 import { getMyTeam, getTeamMembers, getAllTeams, deleteTeam } from "../../lib/team"
@@ -45,9 +48,22 @@ export default function TeamPage() {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
   const [showRequestsModal, setShowRequestsModal] = useState(false)
+  const [processingRequests, setProcessingRequests] = useState(new Set())
+  const [deletingTeams, setDeletingTeams] = useState(new Set())
+  const [notification, setNotification] = useState(null) // { type: 'success'|'error', message: string }
 
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredTeams, setFilteredTeams] = useState([])
+
+  // Auto-hide notification after 4 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null)
+      }, 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
 
   useEffect(() => {
     async function fetchTeams() {
@@ -60,6 +76,10 @@ export default function TeamPage() {
       } catch (error) {
         console.error("Error fetching teams:", error)
         setError("Failed to load teams. Please try again later.")
+        setNotification({
+          type: "error",
+          message: "Failed to load your teams. Please refresh the page.",
+        })
       } finally {
         setLoading(false)
       }
@@ -76,6 +96,10 @@ export default function TeamPage() {
       } catch (error) {
         console.error("Error fetching all teams:", error)
         setError("Failed to load all teams.")
+        setNotification({
+          type: "error",
+          message: "Failed to load all teams. Some features may be limited.",
+        })
       } finally {
         setLoading(false)
       }
@@ -92,6 +116,10 @@ export default function TeamPage() {
     } catch (error) {
       console.error("Error fetching team members:", error)
       setTeamMembers([])
+      setNotification({
+        type: "error",
+        message: "Failed to load team members. Please try again.",
+      })
     }
   }
 
@@ -100,13 +128,37 @@ export default function TeamPage() {
   }
 
   const handleDeleteTeam = async (teamId) => {
+    if (deletingTeams.has(teamId)) return
+
+    // Show confirmation
+    if (!confirm("Are you sure you want to delete this team? This action cannot be undone.")) {
+      return
+    }
+
+    setDeletingTeams((prev) => new Set(prev).add(teamId))
+    setNotification(null)
+
     try {
       await deleteTeam(teamId)
       const updatedTeams = myTeams.filter((team) => team.team_id !== teamId)
       setMyTeams(updatedTeams)
+      setNotification({
+        type: "success",
+        message: "Team deleted successfully!",
+      })
     } catch (error) {
       console.error("Failed to delete team:", error)
-      setError("Greška prilikom brisanja tima.")
+      setError("Failed to delete team.")
+      setNotification({
+        type: "error",
+        message: "Failed to delete team. Please try again.",
+      })
+    } finally {
+      setDeletingTeams((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(teamId)
+        return newSet
+      })
     }
   }
 
@@ -141,8 +193,43 @@ export default function TeamPage() {
       const response = await getMyTeam()
       setMyTeams(response.teams)
       setShowCreateForm(false)
+      setNotification({
+        type: "success",
+        message: "Team created successfully!",
+      })
     } catch (error) {
       console.error("Error refreshing teams:", error)
+      setNotification({
+        type: "error",
+        message: "Team created but failed to refresh. Please reload the page.",
+      })
+    }
+  }
+
+  const handleJoinTeamRequest = async (teamId) => {
+    if (processingRequests.has(teamId)) return
+
+    setProcessingRequests((prev) => new Set(prev).add(teamId))
+    setNotification(null)
+
+    try {
+      await createRequestForTeam(teamId)
+      setNotification({
+        type: "success",
+        message: "Join request sent successfully!",
+      })
+    } catch (err) {
+      console.error("Failed to send request:", err)
+      setNotification({
+        type: "error",
+        message: "Failed to send join request. Please try again.",
+      })
+    } finally {
+      setProcessingRequests((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(teamId)
+        return newSet
+      })
     }
   }
 
@@ -210,6 +297,32 @@ export default function TeamPage() {
             </p>
           </div>
         </div>
+
+        {/* Notification */}
+        {notification && (
+          <div
+            className={`mb-8 p-6 rounded-2xl border backdrop-blur-sm animate-in slide-in-from-top-5 duration-500 ${
+              notification.type === "success"
+                ? "bg-gradient-to-r from-green-900/20 to-green-800/20 border-green-500/30 text-green-300"
+                : "bg-gradient-to-r from-red-900/20 to-red-800/20 border-red-500/30 text-red-300"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  notification.type === "success" ? "bg-green-500/20" : "bg-red-500/20"
+                }`}
+              >
+                {notification.type === "success" ? (
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                )}
+              </div>
+              <p className="font-medium text-lg">{notification.message}</p>
+            </div>
+          </div>
+        )}
 
         {/* Error */}
         {error && (
@@ -381,9 +494,15 @@ export default function TeamPage() {
                           {team.team_logo && (
                             <div className="w-20 h-20 rounded-2xl flex items-center justify-center ml-4 bg-gradient-to-br from-[#0a7075] to-[#274d60] border-2 border-[#0c969c]/30 shadow-xl group-hover:scale-110 transition-transform duration-300">
                               <img
-                                src="/api/placeholder/64/64"
+                                src={`http://localhost:8000/${team.team_logo.replace(/^\/+/, "")}`}
                                 alt={`${team.name} logo`}
-                                className="w-14 h-14 object-contain rounded-xl"
+                                style={{
+                                  width: "60px",
+                                  height: "60px",
+                                  objectFit: "cover",
+                                  borderRadius: "50%",
+                                  border: "2px solid white",
+                                }}
                               />
                             </div>
                           )}
@@ -420,10 +539,15 @@ export default function TeamPage() {
                           {team.moderator_user_id === currentUser && (
                             <button
                               onClick={() => handleDeleteTeam(team.team_id)}
-                              className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600 group/btn"
+                              disabled={deletingTeams.has(team.team_id)}
+                              className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600 disabled:from-red-600/50 disabled:to-red-700/50 disabled:cursor-not-allowed disabled:scale-100 group/btn"
                             >
-                              <Trash2 className="w-5 h-5 group-hover/btn:animate-pulse" />
-                              Delete Team
+                              {deletingTeams.has(team.team_id) ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-5 h-5 group-hover/btn:animate-pulse" />
+                              )}
+                              {deletingTeams.has(team.team_id) ? "Deleting..." : "Delete Team"}
                             </button>
                           )}
                         </div>
@@ -506,9 +630,15 @@ export default function TeamPage() {
                         {team.team_logo && (
                           <div className="w-20 h-20 rounded-2xl flex items-center justify-center ml-4 bg-gradient-to-br from-[#0a7075] to-[#274d60] border-2 border-[#6ba3be]/30 shadow-xl group-hover:scale-110 transition-transform duration-300">
                             <img
-                              src="/api/placeholder/64/64"
+                              src={`http://localhost:8000/${team.team_logo.replace(/^\/+/, "")}`}
                               alt={`${team.name} logo`}
-                              className="w-14 h-14 object-contain rounded-xl"
+                              style={{
+                                width: "60px",
+                                height: "60px",
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                                border: "2px solid white",
+                              }}
                             />
                           </div>
                         )}
@@ -535,20 +665,19 @@ export default function TeamPage() {
 
                         {team.moderator_user_id !== currentUser && !myTeams.some((t) => t.team_id === team.team_id) && (
                           <button
-                            onClick={async () => {
-                              try {
-                                await createRequestForTeam(team.team_id)
-                                alert("Join request sent!")
-                              } catch (err) {
-                                console.error("Failed to send request:", err)
-                                alert("Failed to send request.")
-                              }
-                            }}
-                            className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-[#0c969c] to-[#6ba3be] text-[#031716] hover:from-[#6ba3be] hover:to-[#0c969c] group/btn relative overflow-hidden"
+                            onClick={() => handleJoinTeamRequest(team.team_id)}
+                            disabled={processingRequests.has(team.team_id)}
+                            className="w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-3 bg-gradient-to-r from-[#0c969c] to-[#6ba3be] text-[#031716] hover:from-[#6ba3be] hover:to-[#0c969c] disabled:from-[#0c969c]/50 disabled:to-[#6ba3be]/50 disabled:cursor-not-allowed disabled:scale-100 group/btn relative overflow-hidden"
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                            <UserPlus className="w-5 h-5 relative z-10 group-hover/btn:animate-pulse" />
-                            <span className="relative z-10">Join Team</span>
+                            {processingRequests.has(team.team_id) ? (
+                              <Loader2 className="w-5 h-5 relative z-10 animate-spin" />
+                            ) : (
+                              <UserPlus className="w-5 h-5 relative z-10 group-hover/btn:animate-pulse" />
+                            )}
+                            <span className="relative z-10">
+                              {processingRequests.has(team.team_id) ? "Sending..." : "Join Team"}
+                            </span>
                           </button>
                         )}
                       </div>
@@ -564,90 +693,89 @@ export default function TeamPage() {
         {showRequestsModal && <RequestTeamModal onClose={() => setShowRequestsModal(false)} />}
         {showCreateForm && <TeamCreateForm onClose={handleCloseCreateForm} onTeamCreated={handleTeamCreated} />}
 
-
-    {/* Team Members Modal */}
-{showMembers && selectedTeam && (
-  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-md">
-    <div className="rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto bg-gradient-to-br from-[#031716] to-[#032f30] border border-[#0c969c]">
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0c969c] to-[#6ba3be] flex items-center justify-center">
-              <Users className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold text-[#0c969c]">{selectedTeam.name}</h3>
-              <p className="text-sm text-[#6ba3be]">Team Squad</p>
-            </div>
-          </div>
-          <button
-            onClick={closeMembers}
-            className="text-xl font-bold p-2 rounded-xl w-10 h-10 flex items-center justify-center bg-[#032f30] text-[#6ba3be] hover:bg-[#0a7075] hover:scale-110 transition-all duration-300"
-          >
-            ×
-          </button>
-        </div>
-
-        {teamMembers.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-br from-[#0a7075] to-[#274d60]">
-              <Users className="w-8 h-8 text-[#6ba3be]" />
-            </div>
-            <h4 className="text-lg font-bold mb-2 text-[#0c969c]">No Members</h4>
-            <p className="text-sm text-[#6ba3be]">This team is ready for players!</p>
-          </div>
-        ) : (
-          <>
-            <div className="mb-4">
-              <h4 className="text-lg font-bold mb-3 text-[#0c969c] flex items-center gap-2">
-                <Trophy className="w-4 h-4" />
-                Squad ({teamMembers.length} players)
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
-                {teamMembers.map((member, index) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center p-3 rounded-xl bg-[#032f30] border border-[#0a7075] hover:border-[#0c969c]/50 transition-all duration-300"
-                  >
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 bg-[#0a7075] border border-[#0c969c]/30">
-                      <span className="text-sm font-bold text-[#6ba3be]">
-                        {member.name ? member.name.charAt(0).toUpperCase() : index + 1}
-                      </span>
+        {/* Team Members Modal */}
+        {showMembers && selectedTeam && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-md">
+            <div className="rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[85vh] overflow-y-auto bg-gradient-to-br from-[#031716] to-[#032f30] border border-[#0c969c]">
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0c969c] to-[#6ba3be] flex items-center justify-center">
+                      <Users className="w-5 h-5 text-white" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-[#0c969c] truncate">
-                        {member.name || `Player ${index + 1}`}
-                      </p>
-                      <p className="text-xs text-[#6ba3be] truncate">{member.position || "Position TBD"}</p>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#0c969c]">{selectedTeam.name}</h3>
+                      <p className="text-sm text-[#6ba3be]">Team Squad</p>
                     </div>
                   </div>
-                ))}
+                  <button
+                    onClick={closeMembers}
+                    className="text-xl font-bold p-2 rounded-xl w-10 h-10 flex items-center justify-center bg-[#032f30] text-[#6ba3be] hover:bg-[#0a7075] hover:scale-110 transition-all duration-300"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {teamMembers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-br from-[#0a7075] to-[#274d60]">
+                      <Users className="w-8 h-8 text-[#6ba3be]" />
+                    </div>
+                    <h4 className="text-lg font-bold mb-2 text-[#0c969c]">No Members</h4>
+                    <p className="text-sm text-[#6ba3be]">This team is ready for players!</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <h4 className="text-lg font-bold mb-3 text-[#0c969c] flex items-center gap-2">
+                        <Trophy className="w-4 h-4" />
+                        Squad ({teamMembers.length} players)
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
+                        {teamMembers.map((member, index) => (
+                          <div
+                            key={member.id}
+                            className="flex items-center p-3 rounded-xl bg-[#032f30] border border-[#0a7075] hover:border-[#0c969c]/50 transition-all duration-300"
+                          >
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 bg-[#0a7075] border border-[#0c969c]/30">
+                              <span className="text-sm font-bold text-[#6ba3be]">
+                                {member.name ? member.name.charAt(0).toUpperCase() : index + 1}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm text-[#0c969c] truncate">
+                                {member.name || `Player ${index + 1}`}
+                              </p>
+                              <p className="text-xs text-[#6ba3be] truncate">{member.position || "Position TBD"}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="text-lg font-bold mb-3 text-[#0c969c] flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Formation
+                      </h4>
+                      <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075] w-full aspect-video">
+                        <FootballFieldVisualization members={teamMembers} />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="text-center pt-4 border-t border-[#0a7075]">
+                  <button
+                    onClick={closeMembers}
+                    className="px-6 py-2 rounded-xl font-semibold bg-[#0c969c] text-[#031716] hover:bg-[#6ba3be] transition-all duration-300"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
-<div className="mb-4">
-  <h4 className="text-lg font-bold mb-3 text-[#0c969c] flex items-center gap-2">
-    <Target className="w-4 h-4" />
-    Formation
-  </h4>
-  <div className="rounded-xl overflow-hidden bg-[#032f30] border border-[#0a7075] w-full aspect-video">
-    <FootballFieldVisualization members={teamMembers} />
-  </div>
-</div>
-          </>
+          </div>
         )}
-
-        <div className="text-center pt-4 border-t border-[#0a7075]">
-          <button
-            onClick={closeMembers}
-            className="px-6 py-2 rounded-xl font-semibold bg-[#0c969c] text-[#031716] hover:bg-[#6ba3be] transition-all duration-300"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
       </div>
     </div>
   )
