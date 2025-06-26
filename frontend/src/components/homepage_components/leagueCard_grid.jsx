@@ -18,7 +18,7 @@ const LeaguesGrid = () => {
      <div className="flex flex-wrap w-full">
     {leagues.slice(0, 2).map((league) => (
       <div className="w-full md:w-1/2 p-4" key={league.league_id}>
-        <Link href={`/league/view/${league.league_id}`} > {/* koristiti Link*/}
+        <Link href={`/league/view/${league.league_id}`} >
       <LeagueCard
         href={`/league/view/${league.league_id}`}
         sport={league.sport}

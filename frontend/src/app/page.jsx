@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Footer from "../components/footer/footer"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Footer from "../components/footer/footer";
 import {
   Trophy,
   Users,
@@ -15,14 +15,14 @@ import {
   Zap,
   Shield,
   Target,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true)
-  }, [])
+    setIsVisible(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#031716] text-white font-sans overflow-hidden">
@@ -41,7 +41,9 @@ export default function Home() {
               {/* Left Content */}
               <div
                 className={`space-y-8 transform transition-all duration-1000 ${
-                  isVisible ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"
+                  isVisible
+                    ? "translate-x-0 opacity-100"
+                    : "-translate-x-10 opacity-0"
                 }`}
               >
                 <div className="space-y-6">
@@ -62,8 +64,11 @@ export default function Home() {
 
                   <p className="text-[#6ba3be] text-xl lg:text-2xl leading-relaxed max-w-2xl">
                     Create, manage, and grow your sports community with{" "}
-                    <span className="text-[#0c969c] font-semibold">NextLeague</span>. The all-in-one platform for league
-                    organizers and club managers.
+                    <span className="text-[#0c969c] font-semibold">
+                      NextLeague
+                    </span>
+                    . The all-in-one platform for league organizers and club
+                    managers.
                   </p>
                 </div>
 
@@ -85,12 +90,18 @@ export default function Home() {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-8 pt-8 border-t border-[#0a7075]/30">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-[#0c969c]">10K+</div>
+                    <div className="text-3xl font-bold text-[#0c969c]">
+                      10K+
+                    </div>
                     <div className="text-[#6ba3be] text-sm">Active Users</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-[#0c969c]">500+</div>
-                    <div className="text-[#6ba3be] text-sm">Leagues Created</div>
+                    <div className="text-3xl font-bold text-[#0c969c]">
+                      500+
+                    </div>
+                    <div className="text-[#6ba3be] text-sm">
+                      Leagues Created
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-[#0c969c]">99%</div>
@@ -102,7 +113,9 @@ export default function Home() {
               {/* Right Content - Hero Image */}
               <div
                 className={`transform transition-all duration-1000 delay-300 ${
-                  isVisible ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"
+                  isVisible
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-10 opacity-0"
                 }`}
               >
                 <div className="relative group">
@@ -138,8 +151,9 @@ export default function Home() {
                 <span className="text-[#0c969c]">to Run Your League</span>
               </h2>
               <p className="text-[#6ba3be] text-xl max-w-3xl mx-auto leading-relaxed">
-                Our platform provides all the tools you need to create and manage successful sports leagues and clubs
-                with ease and efficiency.
+                Our platform provides all the tools you need to create and
+                manage successful sports leagues and clubs with ease and
+                efficiency.
               </p>
             </div>
 
@@ -157,14 +171,16 @@ export default function Home() {
                 {
                   icon: <Users className="w-8 h-8" />,
                   title: "Team Building",
-                  description: "Easily create and manage teams, invite players, and track participation seamlessly.",
+                  description:
+                    "Easily create and manage teams, invite players, and track participation seamlessly.",
                   href: "/team",
                   color: "from-[#0c969c] to-[#6ba3be]",
                 },
                 {
                   icon: <Calendar className="w-8 h-8" />,
                   title: "Smart Scheduling",
-                  description: "Automated scheduling tools to create fair and balanced game calendars effortlessly.",
+                  description:
+                    "Automated scheduling tools to create fair and balanced game calendars effortlessly.",
                   href: "/team",
                   color: "from-[#6ba3be] to-[#0a7075]",
                 },
@@ -189,7 +205,9 @@ export default function Home() {
                     <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[#6ba3be] transition-colors duration-300">
                       {feature.title}
                     </h3>
-                    <p className="text-[#6ba3be] leading-relaxed mb-6">{feature.description}</p>
+                    <p className="text-[#6ba3be] leading-relaxed mb-6">
+                      {feature.description}
+                    </p>
                     <div className="flex items-center gap-2 text-[#0c969c] font-semibold group-hover:gap-4 transition-all duration-300">
                       <span>Learn More</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -222,8 +240,9 @@ export default function Home() {
                   </h2>
 
                   <p className="text-[#6ba3be] text-xl leading-relaxed">
-                    Get detailed analytics on player performance, team statistics, and league trends to make informed
-                    decisions that drive success.
+                    Get detailed analytics on player performance, team
+                    statistics, and league trends to make informed decisions
+                    that drive success.
                   </p>
                 </div>
 
@@ -289,8 +308,9 @@ export default function Home() {
                 </h2>
 
                 <p className="text-[#6ba3be] text-xl max-w-3xl mx-auto leading-relaxed">
-                  Join thousands of league organizers who trust NextLeague to power their sports communities and create
-                  unforgettable experiences.
+                  Join thousands of league organizers who trust NextLeague to
+                  power their sports communities and create unforgettable
+                  experiences.
                 </p>
               </div>
 
@@ -311,11 +331,19 @@ export default function Home() {
 
               {/* Trust Indicators */}
               <div className="pt-12 border-t border-[#0a7075]/30">
-                <p className="text-[#6ba3be] text-sm mb-6">Trusted by organizations worldwide</p>
+                <p className="text-[#6ba3be] text-sm mb-6">
+                  Trusted by organizations worldwide
+                </p>
                 <div className="flex items-center justify-center gap-8 opacity-60">
-                  <div className="text-2xl font-bold text-[#6ba3be]">NextLeague</div>
-                  <div className="text-2xl font-bold text-[#6ba3be]">Sports+</div>
-                  <div className="text-2xl font-bold text-[#6ba3be]">LeagueMax</div>
+                  <div className="text-2xl font-bold text-[#6ba3be]">
+                    NextLeague
+                  </div>
+                  <div className="text-2xl font-bold text-[#6ba3be]">
+                    Sports+
+                  </div>
+                  <div className="text-2xl font-bold text-[#6ba3be]">
+                    LeagueMax
+                  </div>
                 </div>
               </div>
             </div>
@@ -325,5 +353,5 @@ export default function Home() {
 
       <Footer />
     </div>
-  )
+  );
 }

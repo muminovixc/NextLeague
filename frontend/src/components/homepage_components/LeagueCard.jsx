@@ -15,9 +15,9 @@ const LeagueCard = ({ sport, leagueName, role, teamCount, isPublic, href }) => {
         {sport}
       </span>
 
-      <Link href={href}>
+      
         <h2 className="mt-3 text-lg font-semibold">{leagueName}</h2>
-      </Link>
+     
 
       <div className="flex items-center mt-2 text-sm text-cyan-300 font-medium">
         <UserIcon className="h-4 w-4 mr-1" />
