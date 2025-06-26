@@ -1,6 +1,6 @@
 from repositories import team_repository as TeamRepository
 from schemas.team_schema import TeamCreate, TeamUpdate
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile, File
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 from models.team_model import Team,TeamStatistic
@@ -91,72 +91,34 @@ def deleteTeam(db: Session, team_id: int, token: str):
         )
 
 
-def createTeam(db: Session, team: Team, token: str):
+def create_team_with_logo(
+    db: Session,
+    token: str,
+    name: str,
+    team_sport: str,
+    country: str,
+    team_identification: Optional[str],
+    team_logo: Optional[UploadFile]
+):
     try:
         statement = decode_access_token(token)
         user_id = statement.get("id")
         if not user_id:
-            raise HTTPException(
-                status_code=401,
-                detail="User ID not found in token."
-            )
+            raise HTTPException(status_code=401, detail="User ID not found in token.")
 
-        # Postavi moderatora
-        team.moderator_user_id = user_id
-
-        # Dodaj tim i commitaj da dobije team_id
-        db.add(team)
-        db.commit()
-        db.refresh(team)
-
-        # Dodaj moderatora kao člana tima
-        member = TeamMembers(user_id=user_id, team_id=team.team_id)
-        db.add(member)
-
-        # Dodaj inicijalnu statistiku
-        statistic = TeamStatistic(
-            moderator_user_id=user_id,
-            team_id=team.team_id,
-            league_id=None,  # Ako se naknadno doda liga
-            number_of_matches_played=0,
-            number_of_wins=0,
-            number_of_draws=0,
-            number_of_losses=0,
-            win_points=0,
-            lose_points=0,
-            difference_points=0,
-            points=0
+        return TeamRepository.createTeam(
+            db=db,
+            user_id=user_id,
+            name=name,
+            team_sport=team_sport,
+            country=country,
+            team_identification=team_identification,
+            team_logo=team_logo
         )
-        db.add(statistic)
-
-        db.commit()
-        return team
-
-    except HTTPException:
-        raise
 
     except Exception as e:
-        db.rollback()
-        error_msg = str(e)
-        print(f"Error creating team: {error_msg}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-        if "maksimalan broj timova" in error_msg.lower():
-            raise HTTPException(
-                status_code=400,
-                detail="Dostigli ste maksimalan broj timova koji možete kreirati."
-            )
-
-        if "psycopg2.errors.RaiseException" in error_msg:
-            if "korisnik regular je dostigao maksimalan broj timova" in error_msg.lower():
-                raise HTTPException(
-                    status_code=400,
-                    detail="Dostigli ste maksimalan broj timova koji možete kreirati."
-                )
-
-        raise HTTPException(
-            status_code=500,
-            detail=f"Greška prilikom kreiranja tima: {error_msg}"
-        )
     
 def getMyTeamsModeratorFiltered(db: Session, token: str, league_sport: str):
     try:

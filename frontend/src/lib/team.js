@@ -39,35 +39,30 @@ export async function getTeamById(teamId) {
 
 
 export async function createTeam(teamData) {
-  try{
+  try {
     const res = await fetch(`${API_URL}/team/createTeam`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(teamData),
+      body: teamData, // FormData se šalje direktno bez JSON.stringify
       credentials: 'include',
     });
 
     if (!res.ok) {
-      // Pokušaj da pročitaš grešku iz response-a
       const errorData = await res.json().catch(() => null);
-      
       if (errorData && errorData.detail) {
-        // Ako je greška povezana sa maksimalnim brojem timova
         if (errorData.detail.includes("maksimalan broj timova")) {
           throw new Error("Dostigli ste maksimalan broj timova koji možete kreirati.");
         }
         throw new Error(errorData.detail);
       }
-      
       throw new Error('Failed to create team');
     }
+
     return await res.json();
   } catch (error) {
     throw error;
   }
 }
+
 
 export async function getMyTeam() {
   try {

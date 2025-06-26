@@ -238,11 +238,19 @@ export default function TeamView() {
                     className="w-24 h-24 rounded-2xl flex items-center justify-center"
                     style={{ backgroundColor: "#0a7075" }}
                   >
-                    <img
-                      src={team.team_logo}
-                      alt={`${team.name} logo`}
-                      className="w-20 h-20 object-contain rounded-xl"
-                    />
+            <img
+  src={`http://localhost:8000/${team.team_logo.replace(/^\/+/, '')}`}
+  alt={`${team.name} logo`}
+  style={{
+    width: "60px",
+    height: "60px",
+    objectFit: "cover",
+    borderRadius: "50%",
+    border: "2px solid white",
+  }}
+/>
+
+
                   </div>
                 ) : (
                   <div
