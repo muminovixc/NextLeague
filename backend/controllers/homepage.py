@@ -85,7 +85,7 @@ def search(query: str, session: Session = Depends(get_session)):
         leagues = leagues_query.scalars().all()
 
         return {
-            "players": [PlayerSchema(id=p.id, name=p.name) for p in players],
+            "players": [PlayerSchema(id=p.id, name=p.name, surname=p.surname) for p in players],
             "teams": [TeamSchema(id=t.team_id, name=t.name) for t in teams],
             "leagues": [LeagueSchema(id=l.league_id, name=l.name, sport=l.sport, access=l.access) for l in leagues]
         }

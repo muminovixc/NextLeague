@@ -1,14 +1,12 @@
 from sqlmodel import Session, select
+from fastapi import UploadFile, File
 from sqlalchemy import or_
-from sqlalchemy.orm import aliased
-
 from models.team_model import Team
 from models.team_model import TeamStatistic
-from models.user_model import User
-from models.league_model import League
-from models.league_model import Calendar
-
+from models.user_model import User, UserChart
+from models.league_model import Calendar, League
 from models.team_members_models import TeamMembers
+
 
 from typing import List, Optional
 # ovde uradi isti upit samo da je moderator_user_id == user_id
@@ -30,19 +28,44 @@ def getMyTeams(db: Session, user_id: int):
     return results.all()
 
 
-def createTeam(db: Session, team: Team, user_id: int):
+def createTeam(
+   db: Session,
+    user_id: int,
+    name: str,
+    team_sport: str,
+    country: str,
+    team_identification: Optional[str],
+    team_logo: Optional[UploadFile]
+):
     try:
+        logo_path = None
+        if team_logo:
+            folder_path = "images/team"
+            os.makedirs(folder_path, exist_ok=True)
+            filename = f"{name.lower().replace(' ', '_')}_{team_logo.filename}"
+            full_path = os.path.join(folder_path, filename)
+            with open(full_path, "wb") as buffer:
+                shutil.copyfileobj(team_logo.file, buffer)
+            logo_path = f"/images/team/{filename}"
+
+        team = Team(
+            name=name,
+            team_sport=team_sport,
+            country=country,
+            team_identification=team_identification,
+            team_logo=logo_path,
+            moderator_user_id=user_id
+        )
+
         db.add(team)
         db.commit()
         db.refresh(team)
 
-        member = TeamMembers(user_id=user_id, team_id=team.team_id)
-        db.add(member)
-
-        statistic = TeamStatistic(
+        db.add(TeamMembers(user_id=user_id, team_id=team.team_id))
+        db.add(TeamStatistic(
             moderator_user_id=user_id,
             team_id=team.team_id,
-            league_id=None,  
+            league_id=None,
             number_of_matches_played=0,
             number_of_wins=0,
             number_of_draws=0,
@@ -51,11 +74,8 @@ def createTeam(db: Session, team: Team, user_id: int):
             lose_points=0,
             difference_points=0,
             points=0
-        )
-        db.add(statistic)
-
+        ))
         db.commit()
-
         return team
 
     except Exception as e:
@@ -87,18 +107,24 @@ def getTeamById(db: Session, team_id: int):
         league.dict() if league else None
     ]
 #def getTeamStatistic(db: Session, team_id: int):
-  #  statement = select(Team).where(Team.team_id == team_id)
-  #  results = db.exec(statement)
-  #  return results.first()
+ #   statement = select(Team).where(Team.team_id == team_id)
+   # results = db.exec(statement)
+    #return results.first()
 
 def getTeamMembers(db: Session, team_id: int):
     statement = (
-        select(User.id, User.name, User.surname)
+        select(User)
         .join(TeamMembers, User.id == TeamMembers.user_id)
         .where(TeamMembers.team_id == team_id)
     )
-    results = db.exec(statement)
-    return results.all()
+    users = db.exec(statement).all()
+    result = []
+    for user in users:
+        charts = db.exec(select(UserChart).where(UserChart.player_id == user.id)).all()
+        user_dict = user.dict(include={"id", "name", "surname", "profile_picture"})
+        user_dict["charts"] = [chart.dict() for chart in charts]
+        result.append(user_dict)
+    return result
 
 def deleteTeam(db: Session, team_id: int,user_id: int):
     statement = select(Team).where(
@@ -113,7 +139,7 @@ def deleteTeam(db: Session, team_id: int,user_id: int):
     db.commit()
     return team 
 
-def get_teams_for_user(db, user_id: int):
+def get_teams_for_user(db:Session, user_id: int):
     statement = (
         select(Team)
         .join(TeamMembers, TeamMembers.team_id == Team.team_id, isouter=True)
@@ -135,39 +161,11 @@ def getTeamsByModeratorAndSport(db: Session, user_id: int, sport: str):
     results = db.exec(statement).all()
     return results
 
-
-def get_calendar_by_team_id(session: Session, team_id: int):
-    TeamOne = aliased(Team)
-    TeamTwo = aliased(Team)
-
-    stmt = (
-        select(
-            Calendar,
-            TeamOne.name.label("team_one_name"),
-            TeamTwo.name.label("team_two_name")
+def get_calendar_by_team_id(db: Session, team_id: int):
+    statement = select(Calendar).where(
+        or_(
+            Calendar.team_one_id == team_id,
+            Calendar.team_two_id == team_id
         )
-        .join(TeamOne, Calendar.team_one_id == TeamOne.team_id)
-        .join(TeamTwo, Calendar.team_two_id == TeamTwo.team_id)
-        .where((Calendar.team_one_id == team_id) | (Calendar.team_two_id == team_id))
-        .order_by(Calendar.date.asc())
     )
-
-    results = session.exec(stmt).all()
-
-    matches = []
-    for calendar, team_one_name, team_two_name in results:
-        matches.append({
-            "id": calendar.id,
-            "league_id": calendar.league_id,
-            "team_one_id": calendar.team_one_id,
-            "team_two_id": calendar.team_two_id,
-            "date": calendar.date,
-            "status": calendar.status,
-            "statistic_after_match_id": calendar.statistic_after_match_id,
-            "team_one_name": team_one_name,
-            "team_two_name": team_two_name,
-            "result": None,  # ili generiši na osnovu podataka
-            "location": "Online"  # ako nemaš polje za lokaciju
-        })
-
-    return matches
+    return db.exec(statement).all()

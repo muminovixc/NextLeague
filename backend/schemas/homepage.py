@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Literal
+from typing import Optional
 from typing import List
 from typing import Optional
 
@@ -12,6 +13,7 @@ class UserResponse(BaseModel):
     email: str
     phone_number: str
     user_type_id: int
+    birth_date: Optional[date] = None  # <-- OVO DODAJ
 
     class Config:
         from_attributes = True
@@ -50,6 +52,7 @@ class TeamRead(BaseModel):
 class PlayerSchema(BaseModel):
     id: int
     name: str
+    surname: str
 
 class TeamSchema(BaseModel):
     id: int

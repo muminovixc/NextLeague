@@ -6,15 +6,15 @@ import UserTeamsView from "../userteams/UserTeamsView";
 import UserLeaguesView from "../userleagues/UserLeaguesView";
 
 const sportMap = {
-  Football: 'fudbal',
-  Basketball: 'kosarka',
-  Volleyball: 'odbojka',
-  Handball: 'rukomet',
+  Football: 'football',
+  Basketball: 'basketball',
+  Volleyball: 'volleyball',
+  Handball: 'handball',
 };
 
 export default function UserViewNavbar({ userId, userData }) {
   const [activeMenu, setActiveMenu] = useState("leagues");
-  const [selectedSport, setSelectedSport] = useState("fudbal");
+  const [selectedSport, setSelectedSport] = useState("football");
 
   const menuItems = [
     { id: "leagues", label: "Leagues" },

@@ -32,7 +32,7 @@ def get_my_profile(db: Session, token: str):
             "email": user.email,
             "user_type_id": user.user_type_id,
             "profile_picture": user.profile_picture,
-            "sport": "fudbal",
+            "sport": "football",
             "charts": charts
         }
         
@@ -61,7 +61,7 @@ def get_user_profile(db: Session, user_id: int):
             "email": user.email,
             "user_type_id": user.user_type_id,
             "profile_picture": user.profile_picture,
-            "sport": "fudbal",
+            "sport": "football",
             "charts": charts
         }
         
@@ -121,7 +121,7 @@ async def update_my_profile(
         "snaga": snaga or 0,
         "izdrzljivost": izdrzljivost or 0,
         "dodavanja": dodavanja or 0,
-        "sport": sport or "fudbal"
+        "sport": sport or "football"
     }
     if existing_chart:
         for key, value in chart_data.items():
