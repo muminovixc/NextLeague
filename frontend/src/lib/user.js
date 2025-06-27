@@ -43,7 +43,6 @@ export async function get_user_profile(userId) {
 
 export const update_user_profile = async (formData) => {
   try {
-    // Kreiraj novi FormData za backend
     const backendFormData = new FormData();
     for (let [key, value] of formData.entries()) {
       backendFormData.append(key, value);
@@ -87,5 +86,13 @@ export async function get_user_leagues(userId) {
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to fetch user leagues');
+  return await res.json();
+}
+
+export async function get_team_statistic(teamId) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/statistics/team/${teamId}`, {
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Failed to fetch team statistic');
   return await res.json();
 }
