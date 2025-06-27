@@ -7,22 +7,14 @@ import CardsGrid from "../../components/homepage_components/homepage_card_grid"
 import LeagueGrid from "../../components/homepage_components/leagueCard_grid"
 import SearchBar from "../../components/homepage_components/searchbar"
 import TeamsGrid from "../../components/homepage_components/team_card_grid"
+import { get_my_profile } from "../../lib/user"
 
 export default function HomePage() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://localhost:8000/user/my_profile", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("you are not logged in")
-        }
-        return res.json()
-      })
+    get_my_profile()
       .then((data) => {
         console.log("User data:", data)
         setUser(data)

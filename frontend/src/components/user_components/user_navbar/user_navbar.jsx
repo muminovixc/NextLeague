@@ -5,8 +5,7 @@ import UserTeams from "../userteams/UserTeams";
 import UserLeagues from "../userleagues/UserLeagues";
 import FootballCalendar from "../user_calendar/FootballCalendar";
 
-export default function UserNavbar() {
-  const [activeMenu, setActiveMenu] = useState(null);
+export default function UserNavbar({ activeMenu, setActiveMenu }) {
   const [selectedSport, setSelectedSport] = useState("Football");
 
   const topMenu = [
@@ -17,17 +16,16 @@ export default function UserNavbar() {
   ];
 
   return (
-    <div>
-      <nav>
-        <ul className="flex space-x-6 bg-[#032f30] text-white p-4 w-full rounded-xl">
+    <div className="w-full">
+      <nav className="bg-[#032f30] rounded-xl p-3 shadow-md">
+        <ul className="flex flex-wrap justify-center gap-4 sm:gap-6">
           {topMenu.map((item) => (
             <li
               key={item.id}
-              className={`cursor-pointer px-3 py-2 rounded-xl whitespace-nowrap transition-all duration-200 ${
-                activeMenu === item.id 
-                  ? "bg-[#0c969c] text-[#031716]" 
-                  : "hover:bg-[#0a7075] hover:text-[#031716]"
-              }`}
+              className={`cursor-pointer px-4 py-2 rounded-lg font-medium text-sm tracking-wide transition-all duration-200 
+                ${activeMenu === item.id
+                  ? "bg-[#0c969c] text-[#031716] shadow-md"
+                  : "bg-[#031716] text-white hover:bg-[#0a7075] hover:text-[#e0f7fa]"}`}
               onClick={() => setActiveMenu(activeMenu === item.id ? null : item.id)}
             >
               {item.label}
@@ -35,29 +33,30 @@ export default function UserNavbar() {
           ))}
         </ul>
       </nav>
-      {/* Prikaz sportova i timova kada je aktivan 'My teams' */}
+
       {activeMenu === "moji_timovi" && (
         <div className="mt-6">
           <SportSelector selectedSport={selectedSport} onSportSelect={setSelectedSport} />
-          <UserTeams selectedSport={selectedSport} />
+          <div className="mt-4 bg-[#031716] rounded-xl p-4 border border-[#0c969c]/20 shadow">
+            <UserTeams selectedSport={selectedSport} />
+          </div>
         </div>
       )}
 
       {activeMenu === "moje_lige" && (
         <div className="mt-6">
           <SportSelector selectedSport={selectedSport} onSportSelect={setSelectedSport} />
-          <UserLeagues selectedSport={selectedSport} />
+          <div className="mt-4 bg-[#031716] rounded-xl p-4 border border-[#0c969c]/20 shadow">
+            <UserLeagues selectedSport={selectedSport} />
+          </div>
         </div>
       )}
 
       {activeMenu === "svi_mecevi" && (
-        <div className="mt-6">
+        <div className="mt-6 bg-[#031716] rounded-xl p-4 border border-[#0c969c]/20 shadow">
           <FootballCalendar />
         </div>
       )}
     </div>
   );
 }
-
-
-

@@ -3,71 +3,38 @@
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts"
 
 export default function SpiderChart({ chartData }) {
-  // Ako nema chartData, koristi default podatke
-  const data = chartData ? [
+  const data = [
     {
       subject: "Napad",
-      A: chartData.napad || 0,
+      A: chartData.napad,
       fullMark: 20,
     },
     {
       subject: "Odbrana",
-      A: chartData.odbrana || 0,
+      A: chartData.odbrana,
       fullMark: 20,
     },
     {
       subject: "Brzina",
-      A: chartData.brzina || 0,
+      A: chartData.brzina,
       fullMark: 20,
     },
     {
       subject: "Snaga",
-      A: chartData.snaga || 0,
+      A: chartData.snaga,
       fullMark: 20,
     },
     {
       subject: "Izdržljivost",
-      A: chartData.izdrzljivost || 0,
+      A: chartData.izdrzljivost,
       fullMark: 20,
     },
     {
       subject: "Dodavanja",
-      A: chartData.dodavanja || 0,
-      fullMark: 20,
-    },
-  ] : [
-    {
-      subject: "Napad",
-      A: 0,
-      fullMark: 20,
-    },
-    {
-      subject: "Odbrana",
-      A: 0,
-      fullMark: 20,
-    },
-    {
-      subject: "Brzina",
-      A: 0,
-      fullMark: 20,
-    },
-    {
-      subject: "Snaga",
-      A: 0,
-      fullMark: 20,
-    },
-    {
-      subject: "Izdržljivost",
-      A: 0,
-      fullMark: 20,
-    },
-    {
-      subject: "Dodavanja",
-      A: 0,
+      A: chartData.dodavanja,
       fullMark: 20,
     },
   ]
-
   return (
     <div className="w-full max-w-lg mx-auto p-3">
       <div className="bg-[#031716] rounded-lg border border-[#0c969c]/20 p-6">
