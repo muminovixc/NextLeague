@@ -60,6 +60,7 @@ export default function TeamStatsPage() {
         if (statsRes.ok) {
           const statData = await statsRes.json()
           setStatistic(statData)
+          console.log("Statistics:", statData)
         } else {
           console.warn("No statistics found")
           setStatistic(null)
