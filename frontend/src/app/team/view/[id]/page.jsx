@@ -23,7 +23,7 @@ export default function TeamView() {
       try {
         setLoading(true)
         const data = await getTeamById(teamId)
-        console.log("Received team data:", data)
+console.log("REZULTAT getTeamById:", JSON.stringify(data, null, 2))
         setTeamData(data)
         setError(null)
       } catch (error) {
