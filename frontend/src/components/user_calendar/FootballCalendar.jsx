@@ -1,21 +1,42 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Calendar, Trophy } from "lucide-react"
 import Button from "../button/button"
-
-// Primer datuma utakmica
-const matchDates = [
-  { date: "2024-12-15", opponent: "Partizan", time: "20:00" },
-  { date: "2024-12-22", opponent: "Crvena Zvezda", time: "18:30" },
-  { date: "2024-12-28", opponent: "Vojvodina", time: "16:00" },
-  { date: "2025-01-05", opponent: "Radnički", time: "19:00" },
-  { date: "2025-01-12", opponent: "Čukarički", time: "17:30" },
-  { date: "2025-01-19", opponent: "TSC", time: "20:15" },
-]
+import { getMyTeam, getCalendarForTeam } from "../../lib/team"
 
 export default function FootballCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [matches, setMatches] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await getMyTeam()
+        const teams = data.teams || []
+        let allMatches = []
+        for (const team of teams) {
+          const teamMatches = await getCalendarForTeam(team.team_id)
+          // Dodaj info o timu za prikaz protivnika
+          teamMatches.forEach(match => {
+            match._userTeamId = team.team_id
+            match._userTeamName = team.name
+          })
+          allMatches = allMatches.concat(teamMatches)
+        }
+        setMatches(allMatches)
+      } catch (err) {
+        setError("Failed to load matches.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMatches()
+  }, [])
 
   const today = new Date()
   const year = currentDate.getFullYear()
@@ -57,10 +78,15 @@ export default function FootballCalendar() {
     setCurrentDate(new Date(year, month + 1, 1))
   }
 
-  // Funkcija za proveru da li je datum utakmica
-  const getMatchForDate = (day) => {
+  // Pronađi utakmice za određeni dan
+  const getMatchesForDate = (day) => {
     const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-    return matchDates.find((match) => match.date === dateString)
+    // Uporedi samo datum (ne vrijeme)
+    return matches.filter(match => {
+      const matchDate = new Date(match.date)
+      const matchDateString = `${matchDate.getFullYear()}-${String(matchDate.getMonth() + 1).padStart(2, "0")}-${String(matchDate.getDate()).padStart(2, "0")}`
+      return matchDateString === dateString
+    })
   }
 
   // Funkcija za proveru da li je danas
@@ -105,7 +131,7 @@ export default function FootballCalendar() {
                   return <div key={index} className="h-20" />
                 }
 
-                const match = getMatchForDate(day)
+                const matchesForDay = getMatchesForDate(day)
                 const todayClass = isToday(day)
 
                 return (
@@ -113,11 +139,7 @@ export default function FootballCalendar() {
                     key={index}
                     className={`
           h-20 border rounded-lg p-2 transition-all duration-200 hover:shadow-md
-          ${
-            match
-              ? "bg-gradient-to-br from-red-100 to-red-200 border-red-300 hover:from-red-200 hover:to-red-300"
-              : "bg-white border-gray-200 hover:bg-gray-50"
-          }
+          ${matchesForDay.length > 0 ? "bg-gradient-to-br from-red-100 to-red-200 border-red-300 hover:from-red-200 hover:to-red-300" : "bg-white border-gray-200 hover:bg-gray-50"}
           ${todayClass ? "ring-2 ring-blue-500 ring-offset-2" : ""}
         `}
                   >
@@ -125,19 +147,26 @@ export default function FootballCalendar() {
                       <div
                         className={`
             text-sm font-medium
-            ${match ? "text-red-800" : "text-gray-700"}
+            ${matchesForDay.length > 0 ? "text-red-800" : "text-gray-700"}
             ${todayClass ? "text-blue-600 font-bold" : ""}
                       `}
                       >
                         {day}
                       </div>
 
-                    {match && (
-                      <div className="flex-1 flex flex-col justify-center items-center">
-                        <div className="text-xs font-semibold text-red-800 text-center leading-tight">
-                          {match.opponent}
-                        </div>
-                        <div className="text-xs text-red-600 mt-1">{match.time}</div>
+                    {matchesForDay.length > 0 && (
+                      <div className="flex-1 flex flex-col justify-center items-center gap-1">
+                        {matchesForDay.map((match, idx) => {
+                          // Prikaži protivnika
+                          const isUserTeamOne = match.team_one.id === match._userTeamId
+                          const opponent = isUserTeamOne ? match.team_two : match.team_one
+                          const time = new Date(match.date).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+                          return (
+                            <div key={idx} className="text-xs font-semibold text-red-800 text-center leading-tight">
+                              vs {opponent?.name || "?"} <span className="text-xs text-red-600 ml-1">{time}</span>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
                   </div>
@@ -145,6 +174,8 @@ export default function FootballCalendar() {
               )
             })}
           </div>
+          {loading && <div className="text-center text-[#0c969c] mt-4">Loading matches...</div>}
+          {error && <div className="text-center text-red-500 mt-4">{error}</div>}
         </div>
       </div>
     </div>

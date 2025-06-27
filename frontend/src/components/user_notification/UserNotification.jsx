@@ -1,0 +1,179 @@
+import { useEffect, useState } from "react";
+import SportSelector from "../userteams/SportSelector";
+import { getMyTeam } from "../../lib/team";
+import { getMyLeagues, getCalendarForLeague } from "../../lib/league";
+
+const sportMap = {
+  Football: "football",
+  Basketball: "basketball",
+  Volleyball: "volleyball",
+  Handball: "handball",
+  football: "football",
+  basketball: "basketball",
+  volleyball: "volleyball",
+  handball: "handball",
+};
+
+export default function UserNotification() {
+  const [selectedSport, setSelectedSport] = useState("football");
+  const [teams, setTeams] = useState([]);
+  const [leagues, setLeagues] = useState([]);
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Dohvati sve timove korisnika
+        const teamData = await getMyTeam();
+        const filteredTeams = (teamData.teams || []).filter(
+          (team) => sportMap[team.team_sport] === selectedSport
+        );
+        setTeams(filteredTeams);
+
+        // Dohvati sve lige korisnika
+        const leagueData = await getMyLeagues();
+        const filteredLeagues = (leagueData || []).filter(
+          (league) => sportMap[league.sport] === selectedSport
+        );
+        setLeagues(filteredLeagues);
+
+        // Dohvati sve završene utakmice za sve timove
+        let allMatches = [];
+        for (const team of filteredTeams) {
+          // Za svaki tim, pronađi lige u kojima je
+          for (const league of filteredLeagues) {
+            // Za svaku ligu, povuci kalendar
+            const leagueMatches = await getCalendarForLeague(league.league_id);
+            // Filtriraj samo utakmice gdje je ovaj tim igrao i postoji statistika
+            const teamMatches = leagueMatches.filter(
+              (match) =>
+                (match.team_one.id === team.team_id || match.team_two.id === team.team_id) &&
+                match.statistic &&
+                match.status && match.status.toUpperCase() !== "SCHEDULED"
+            ).map((match) => ({
+              ...match,
+              _userTeamId: team.team_id,
+              _userTeamName: team.name,
+              _leagueName: league.name,
+              _leagueId: league.league_id,
+            }));
+            allMatches = allMatches.concat(teamMatches);
+          }
+        }
+        setMatches(allMatches);
+      } catch (err) {
+        setError("Failed to load notifications.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [selectedSport]);
+
+  // Pripremi notifikacije
+  let notifications = [];
+
+  // Kreiranje tima
+  for (const team of teams) {
+    notifications.push({
+      type: "team_created",
+      date: team.created_at || team.createdAt || null,
+      text: `Team created: ${team.name}`,
+      team,
+    });
+  }
+
+  // Kreiranje lige
+  for (const league of leagues) {
+    notifications.push({
+      type: "league_created",
+      date: league.created_at || league.createdAt || null,
+      text: `League created: ${league.name}`,
+      league,
+    });
+  }
+
+  // Utakmice (pobjede/porazi)
+  for (const match of matches) {
+    const isUserTeamOne = match.team_one.id === match._userTeamId;
+    const userTeam = isUserTeamOne ? match.team_one : match.team_two;
+    const opponent = isUserTeamOne ? match.team_two : match.team_one;
+    const userScore = isUserTeamOne ? match.statistic.win_points : match.statistic.lose_points;
+    const opponentScore = isUserTeamOne ? match.statistic.lose_points : match.statistic.win_points;
+    let resultType = "draw";
+    if (match.statistic.winner_id === userTeam.id) resultType = "win";
+    else if (match.statistic.looser_id === userTeam.id) resultType = "loss";
+    notifications.push({
+      type: "match_result",
+      date: match.date,
+      resultType,
+      league: match._leagueName,
+      leagueId: match._leagueId,
+      userTeam: userTeam.name,
+      opponent: opponent.name,
+      userScore,
+      opponentScore,
+    });
+  }
+
+  // Sortiraj po datumu (najnovije prvo)
+  notifications = notifications.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+  return (
+    <div>
+      <SportSelector selectedSport={selectedSport} onSportSelect={setSelectedSport} />
+      <div className="space-y-4">
+        {loading && <div className="text-[#0c969c]">Loading notifications...</div>}
+        {error && <div className="text-red-500">{error}</div>}
+        {!loading && notifications.length === 0 && (
+          <div className="text-[#6ba3be] text-center">No notifications for this sport.</div>
+        )}
+        {notifications.map((notif, idx) => {
+          if (notif.type === "team_created") {
+            return (
+              <div key={idx} className="rounded-xl p-4 bg-[#032f30] border-l-4 border-[#0c969c] text-[#6ba3be] shadow">
+                <div className="font-bold text-[#0c969c]">Team Created</div>
+                <div>{notif.text}</div>
+                {notif.date && <div className="text-xs mt-1">{new Date(notif.date).toLocaleString()}</div>}
+              </div>
+            );
+          }
+          if (notif.type === "league_created") {
+            return (
+              <div key={idx} className="rounded-xl p-4 bg-[#031716] border-l-4 border-[#0a7075] text-[#6ba3be] shadow">
+                <div className="font-bold text-[#0a7075]">League Created</div>
+                <div>{notif.text}</div>
+                {notif.date && <div className="text-xs mt-1">{new Date(notif.date).toLocaleString()}</div>}
+              </div>
+            );
+          }
+          if (notif.type === "match_result") {
+            let bg = "bg-[#032f30] border-l-4 border-[#0a7075]";
+            if (notif.resultType === "win") bg = "bg-green-900/40 border-l-green-500";
+            if (notif.resultType === "loss") bg = "bg-red-900/40 border-l-red-500";
+            if (notif.resultType === "draw") bg = "bg-yellow-900/40 border-l-yellow-500";
+            return (
+              <div key={idx} className={`rounded-xl p-4 ${bg} text-white shadow flex flex-col gap-1`}>
+                <div className="font-bold text-lg">
+                  {notif.league ? `League: ${notif.league}` : "Match Result"}
+                </div>
+                <div className="text-base">
+                  {notif.userTeam} <span className="font-bold">{notif.userScore} - {notif.opponentScore}</span> {notif.opponent}
+                </div>
+                {notif.date && <div className="text-xs mt-1 text-[#6ba3be]">{new Date(notif.date).toLocaleString()}</div>}
+                {notif.resultType === "win" && <div className="text-green-400 font-semibold">Your team won!</div>}
+                {notif.resultType === "loss" && <div className="text-red-400 font-semibold">Your team lost.</div>}
+                {notif.resultType === "draw" && <div className="text-yellow-400 font-semibold">Draw.</div>}
+              </div>
+            );
+          }
+          return null;
+        })}
+      </div>
+    </div>
+  );
+} 

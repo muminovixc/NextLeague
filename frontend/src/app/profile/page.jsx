@@ -5,6 +5,7 @@ import { get_my_profile } from "../../lib/user";
 import { update_user_profile } from "../../lib/user";
 import UserNavbar from "../../components/user_navbar/user_navbar";
 import SpiderChart from "../../components/user_charts/SpiderChart";
+import UserNotification from "../../components/user_notification/UserNotification";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -37,6 +38,7 @@ export default function ProfilePage() {
   });
   const [updateError, setUpdateError] = useState(null);
   const [updateSuccess, setUpdateSuccess] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -456,7 +458,12 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className="flex-1 flex flex-col">
-            <UserNavbar/>
+            <UserNavbar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+            {activeMenu === "obavijesti" && (
+              <div className="mt-8">
+                <UserNotification />
+              </div>
+            )}
           </div>
         </div>
       </div>

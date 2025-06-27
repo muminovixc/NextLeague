@@ -5,8 +5,7 @@ import UserTeams from "../userteams/UserTeams";
 import UserLeagues from "../userleagues/UserLeagues";
 import FootballCalendar from "../user_calendar/FootballCalendar";
 
-export default function UserNavbar() {
-  const [activeMenu, setActiveMenu] = useState(null);
+export default function UserNavbar({ activeMenu, setActiveMenu }) {
   const [selectedSport, setSelectedSport] = useState("Football");
 
   const topMenu = [
