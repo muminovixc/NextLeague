@@ -7,7 +7,7 @@ export async function getAllTeams() {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include cookies in the request
+      credentials: 'include', 
     });
     if (!res.ok) {
       throw new Error('Failed to fetch teams');
@@ -26,7 +26,7 @@ export async function getTeamById(teamId) {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include cookies in the request
+      credentials: 'include', 
     });
     if (!res.ok) {
       throw new Error('Failed to fetch team');
@@ -42,7 +42,7 @@ export async function createTeam(teamData) {
   try {
     const res = await fetch(`${API_URL}/team/createTeam`, {
       method: 'POST',
-      body: teamData, // FormData se šalje direktno bez JSON.stringify
+      body: teamData, 
       credentials: 'include',
     });
 
@@ -80,9 +80,8 @@ export async function getMyTeam() {
 
     const data = await res.json();
 
-    // Validacija
     if (!data.teams || !Array.isArray(data.teams)) {
-      return { teams: [], user_id: null }; // fallback
+      return { teams: [], user_id: null }; 
     }
 
     return data;
@@ -99,7 +98,7 @@ export async function getTeamMembers(teamId) {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include cookies in the request
+      credentials: 'include', 
     });
     if (!res.ok) {
       throw new Error('Failed to fetch team members');
@@ -116,7 +115,7 @@ return fetch(`${API_URL}/team/deleteMyTeam/${teamId}`, {
     headers: {
       'Content-Type': 'application/json',
     },
-    credentials: 'include', // Include cookies in the request
+    credentials: 'include', 
   })
   .then(res => {
     if (!res.ok) {

@@ -4,9 +4,10 @@ from sqlalchemy import or_
 from models.team_model import Team
 from models.team_model import TeamStatistic
 from models.user_model import User, UserChart
-from models.league_model import Calendar, League
+from models.league_model import Calendar, League, StatisticAfterMatch
 from models.team_members_models import TeamMembers
-
+import os;
+import shutil;
 
 from typing import List, Optional
 # ovde uradi isti upit samo da je moderator_user_id == user_id
@@ -168,4 +169,43 @@ def get_calendar_by_team_id(db: Session, team_id: int):
             Calendar.team_two_id == team_id
         )
     )
-    return db.exec(statement).all()
+    results = db.exec(statement).all()
+
+    calendar_with_data = []
+
+    for match in results:
+        team_one = db.get(Team, match.team_one_id)
+        team_two = db.get(Team, match.team_two_id)
+
+        match_data = {
+            "id": match.id,
+            "date": match.date,
+            "status": match.status,
+            "league_id": match.league_id,
+            "team_one": {
+                "id": team_one.team_id,
+                "name": team_one.name,
+                "logo": team_one.team_logo,  
+            },
+            "team_two": {
+                "id": team_two.team_id,
+                "name": team_two.name,
+                "logo": team_two.team_logo, 
+            },
+        }
+
+        if match.statistic_after_match_id:
+            stat = db.get(StatisticAfterMatch, match.statistic_after_match_id)
+            if stat:
+                match_data["statistic"] = {
+                    "winner_id": stat.winner_id,
+                    "looser_id": stat.looser_id,
+                    "win_points": stat.win_points,
+                    "lose_points": stat.lose_points,
+                    "best_player_id": stat.best_player_id,
+                    "event_time": stat.event_time
+                }
+
+        calendar_with_data.append(match_data)
+
+    return calendar_with_data
