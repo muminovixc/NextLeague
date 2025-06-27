@@ -90,17 +90,18 @@ def GetAllTeams(db: Session):
 
 def getTeamById(db: Session, team_id: int):
     statement = (
-        select(Team, TeamStatistic,League)
+        select(Team, TeamStatistic, League)
         .join(TeamStatistic, Team.team_id == TeamStatistic.team_id)
-.outerjoin(League, TeamStatistic.league_id == League.league_id) 
+        .outerjoin(League, TeamStatistic.league_id == League.league_id)
         .where(Team.team_id == team_id)
+        .order_by(TeamStatistic.team_statistic_id.desc())  
     )
     result = db.exec(statement).first()
     
     if not result:
         return None
     
-    team, team_statistic,league = result
+    team, team_statistic, league = result
     
     return [
         team.dict() if team else None,

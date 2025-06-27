@@ -36,7 +36,7 @@ app.mount("/images/team", StaticFiles(directory="images/team"), name="team_image
 
 # Include routers
 
- 
+  
  
 app.include_router(auth_router)
 app.include_router(league_router)  
