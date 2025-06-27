@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { get_my_profile } from "../../lib/user";
 import { update_user_profile } from "../../lib/user";
-import UserNavbar from "../../components/user_navbar/user_navbar";
-import SpiderChart from "../../components/user_charts/SpiderChart";
-import UserNotification from "../../components/user_notification/UserNotification";
+import UserNavbar from "../../components/user_components/user_navbar/user_navbar";
+import SpiderChart from "../../components/user_components/user_charts/SpiderChart";
+import UserNotification from "../../components/user_components/user_notification/UserNotification";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -98,7 +98,6 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       updateChartData(user, selectedSport);
-      // Update form fields for stats as well when sport changes
       const chart = user.charts?.find(chart => chart.sport === selectedSport);
       setFormData(prev => ({
         ...prev,
@@ -144,7 +143,6 @@ export default function ProfilePage() {
     setUpdateError(null);
     setUpdateSuccess(null);
 
-    // Validacija šifre
     if (formData.password && formData.password !== formData.confirmPassword) {
       setUpdateError("Šifre se ne podudaraju");
       return;
@@ -171,12 +169,22 @@ export default function ProfilePage() {
 
     try {
       const updatedUser = await update_user_profile(formDataObj);
-      setUser(updatedUser);
-      updateChartData(updatedUser, selectedSport);
-      setUpdateSuccess('Profil uspješno ažuriran');
+      console.log("UPDATE RESPONSE:", updatedUser);
+      if (Array.isArray(updatedUser)) {
+        setUpdateSuccess(updatedUser.map(obj => obj.message || JSON.stringify(obj)).join(", "));
+      } else {
+        setUpdateSuccess(updatedUser.message || "Profil uspješno ažuriran");
+      }
+      const refreshedUser = await get_my_profile();
+      setUser(refreshedUser);
+      updateChartData(refreshedUser, selectedSport);
       setIsEditing(false);
     } catch (err) {
-      setUpdateError(err.message);
+      if (Array.isArray(err)) {
+        setUpdateError(err.map(obj => obj.message || JSON.stringify(obj)).join(", "));
+      } else {
+        setUpdateError(err.message);
+      }
     }
   };
 
@@ -216,13 +224,22 @@ export default function ProfilePage() {
 
               {!isEditing ? (
                 <>
-                  <h3 className="text-2xl font-bold text-white text-center mb-2">
+                  <div className="bg-[#031716] border border-[#0c969c]/30 rounded-xl px-6 py-4 mb-6 shadow-sm">
+                  <h3 className="text-xl font-bold text-[#0c969c] text-center mb-3">
                     {user.name} {user.surname}
                   </h3>
-                  <p className="text-[#6ba3be] text-center mb-4">{user.phone_number}</p>
-                  <p className="text-[#6ba3be] text-center mb-4">{user.email}</p>
+                  <div className="text-sm text-[#6ba3be] space-y-2 text-center">
+                    <p className="flex justify-center items-center gap-2">
+                      <span className="text-[#0c969c]">📞</span>
+                      {user.phone_number}
+                    </p>
+                    <p className="flex justify-center items-center gap-2">
+                      <span className="text-[#0c969c]">📧</span>
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
                   
-                  {/* Sport Selector */}
                   <div className="flex justify-center mb-6">
                     <select
                       value={selectedSport}
@@ -236,7 +253,6 @@ export default function ProfilePage() {
                     </select>
                   </div>
                   
-                  {/* SpiderChart */}
                   <div className="mb-6">
                     <SpiderChart 
                       chartData={chartData} 

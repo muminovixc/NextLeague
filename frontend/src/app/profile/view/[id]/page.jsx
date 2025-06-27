@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import UserViewNavbar from "../../../../components/user_navbar/user_view_navbar";
-import { get_user_profile, get_user_teams } from "../../../../lib/user";
+import UserViewNavbar from "../../../../components/user_components/user_navbar/user_view_navbar";
+import { get_user_profile, get_user_teams, get_team_statistic } from "../../../../lib/user";
 
 export default function ProfileViewPage() {
   const params = useParams();
@@ -13,7 +13,7 @@ export default function ProfileViewPage() {
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
     totalGoals: 0,
-    bestPlayer: 0, // Placeholder, treba backend podršku
+    bestPlayer: 0,
     matchesPlayed: 0,
     wins: 0,
   });
@@ -23,28 +23,19 @@ export default function ProfileViewPage() {
       try {
         const data = await get_user_profile(userId);
         setUser(data);
-        // Dohvati sve timove korisnika
         const teams = await get_user_teams(userId);
-        console.log('USER TEAMS:', teams);
         let totalGoals = 0;
         let matchesPlayed = 0;
         let wins = 0;
-        // let bestPlayer = 0; // Placeholder
         for (const team of teams) {
-          // Dohvati statistiku tima
-          const res = await fetch(`http://localhost:8000/statistics/team/${team.team_id}`, { credentials: "include" });
-          if (res.ok) {
-            const stat = await res.json();
-            console.log('STAT FOR TEAM', team.team_id, stat);
-            totalGoals += stat.win_points || 0;
-            matchesPlayed += stat.number_of_matches_played || 0;
-            wins += stat.number_of_wins || 0;
-            // bestPlayer += 0; // Dodaj logiku kad budeš imao podatak
-          }
+          const stat = await get_team_statistic(team.team_id);
+          totalGoals += stat.win_points || 0;
+          matchesPlayed += stat.number_of_matches_played || 0;
+          wins += stat.number_of_wins || 0;
         }
         setStats({
           totalGoals,
-          bestPlayer: 0, // Placeholder dok ne bude backend podrške
+          bestPlayer: 0,
           matchesPlayed,
           wins,
         });
@@ -94,13 +85,23 @@ export default function ProfileViewPage() {
                 </div>
               )}
 
-              <h3 className="text-2xl font-bold text-white text-center mb-2">
-                {user.name} {user.surname}
-              </h3>
-              <p className="text-[#6ba3be] text-center mb-4">{user.phone_number}</p>
-              <p className="text-[#6ba3be] text-center mb-4">{user.email}</p>
-              {/* 4 polja statistike */}
-              <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="bg-[#031716] border border-[#0c969c]/30 rounded-xl px-6 py-4 mb-6 shadow-sm">
+                <h3 className="text-xl font-bold text-[#0c969c] text-center mb-3">
+                  {user.name} {user.surname}
+                </h3>
+                <div className="text-sm text-[#6ba3be] space-y-2 text-center">
+                  <p className="flex justify-center items-center gap-2">
+                    <span className="text-[#0c969c]">📞</span>
+                    {user.phone_number}
+                  </p>
+                  <p className="flex justify-center items-center gap-2">
+                    <span className="text-[#0c969c]">📧</span>
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
                 <div className="bg-[#032f30] rounded-xl p-4 text-center border border-[#0a7075]">
                   <div className="text-2xl font-bold text-[#0c969c]">{stats.totalGoals}</div>
                   <div className="text-[#6ba3be] text-sm mt-1">Total Goals</div>
