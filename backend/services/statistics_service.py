@@ -36,7 +36,7 @@ def get_team_players_info_service(db: Session, team_id: int) -> TeamPlayersRespo
 
 
 def get_team_statistic_service(db: Session, team_id: int) -> TeamStatResponse:
-    stat = db.query(TeamStatistic).filter(TeamStatistic.team_id == team_id).first()
+    stat = db.query(TeamStatistic).filter(TeamStatistic.team_id == team_id).all()[-1]
     if not stat:
         raise HTTPException(status_code=404, detail="No statistics found for this team.")
 
