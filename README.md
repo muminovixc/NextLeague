@@ -28,6 +28,21 @@ Video of the project: https://youtu.be/qwrfvgCDzGg?si=Ecj13IvgSsLPGLbG
 - PostgreSQL or MySQL (configurable)
 - SQLAlchemy or Tortoise ORM
 
+- ## 💳 Online Payments & VIP
+
+- Users can upgrade to VIP plans for additional features and capacity.
+- Payments are processed securely via [Stripe](https://stripe.com/).
+- After payment, user accounts are automatically upgraded.
+- See `frontend/src/components/vip_cards/vip_cards.jsx` and `backend/controllers/vip_controller.py` for implementation details.
+
+### How it works
+
+1. User selects a VIP plan and clicks "Upgrade".
+2. The app creates a Stripe Checkout session and redirects the user.
+3. After successful payment, the backend verifies the session and upgrades the user.
+
+> **Note:** You must set your Stripe API keys in environment variables for both frontend and backend.
+
 **Other:**
 - REST API
 - Git & GitHub
